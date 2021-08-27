@@ -1,21 +1,25 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+books = []
 
 
 @app.route('/books', methods=['GET'])
-def get_booklist():  # Get a list of books
-    pass
+def get_book_list():  # Get a list of books
+    return jsonify({'books': books})
 
 
 @app.route('/books', methods=['POST'])
 def add_book():  # Create a new book
-    pass
+    data = request.get_json()
+    new_book = {
+        'title': data['title'],
+        'author': data['author'],
+        'year': data['year']
+    }
+    books.append(new_book)
+    return jsonify(new_book)
 
 
 @app.route('/book/<int:book_id>', methods=['GET'])
@@ -33,7 +37,7 @@ def reserve_book():  # Reserve a book or cancel a reservation
     pass
 
 
-@app.route('lend', methods=['POST'])
+@app.route('/lend', methods=['POST'])
 def lend_book():  # Lend or return a book
     pass
 
