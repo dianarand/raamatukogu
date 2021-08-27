@@ -16,24 +16,30 @@ def add_book():  # Create a new book
     new_book = {
         'title': data['title'],
         'author': data['author'],
-        'year': data['year']
+        'year': data['year'],
+        'active': True
     }
     books.append(new_book)
     return jsonify(new_book)
 
 
 @app.route('/book/<int:book_id>', methods=['GET'])
-def get_book():  # Get a book
-    pass
+def get_book(book_id):  # Get a book
+    return jsonify(books[book_id])
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
-def remove_book():  # Remove a book
-    pass
+def remove_book(book_id):  # Remove a book
+    books[book_id]['active'] = False
+    return jsonify(books[book_id])
 
 
 @app.route('/reserve', methods=['POST'])
 def reserve_book():  # Reserve a book or cancel a reservation
+    data = request.get_json()
+    book_id = data['book_id']
+    if not books[book_id]['active']:
+        return jsonify({"message": "book not available"})
     pass
 
 
