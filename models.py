@@ -45,8 +45,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80))
     password = db.Column(db.String(80))
-    lender = db.Column()
-    borrower = db.Column()
+    lender = db.Column(db.Integer)
+    borrower = db.Column(db.Integer)
 
     def __init__(self, _id, username, password, lender, borrower):
         self.id = _id
