@@ -15,7 +15,9 @@ def get_book_list():  # Get a list of books
         book = {
             "id": row[0],
             "title": row[1],
-            "author": row[2]
+            "author": row[2],
+            "year": row[3],
+            "active": bool(row[4])
         }
         books.append(book)
 
@@ -52,7 +54,9 @@ def get_book(book_id):  # Get a book
         book = {
             "id": row[0],
             "title": row[1],
-            "author": row[2]
+            "author": row[2],
+            "year": row[3],
+            "active": bool(row[4])
         }
     else:
         book = None
@@ -64,9 +68,16 @@ def get_book(book_id):  # Get a book
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
 def remove_book(book_id):  # Remove a book
-    # books[book_id]['active'] = False
-    # return jsonify(books[book_id])
-    pass
+    connection = sqlite3.connect('data.db')
+    cursor = connection.cursor()
+
+    query = 'UPDATE books SET active=0 WHERE id=?'
+    cursor.execute(query, (book_id,))
+
+    connection.commit()
+    connection.close()
+
+    return {'message': 'book removed successfully'}
 
 
 @app.route('/reserve', methods=['POST'])
