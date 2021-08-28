@@ -1,4 +1,3 @@
-import sqlite3
 from flask import Flask, request
 from db import db
 from models import Book
@@ -12,23 +11,7 @@ db.init_app(app)
 
 @app.route('/books', methods=['GET'])
 def get_book_list():  # Get a list of books
-    connection = sqlite3.connect('data.db')
-    cursor = connection.cursor()
-    result = cursor.execute('SELECT * FROM books')
-
-    books = []
-    for row in result:
-        book = {
-            "id": row[0],
-            "title": row[1],
-            "author": row[2],
-            "year": row[3],
-            "active": bool(row[4])
-        }
-        books.append(book)
-
-    connection.close()
-    return {'books': books}
+    return {'items': [book.json() for book in Book.query.all()]}
 
 
 @app.route('/books', methods=['POST'])
