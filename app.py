@@ -1,10 +1,16 @@
 from flask import Flask, request
 from db import db
-from models import Book
+from models import Book, Lending, Reservation, User
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 
 db.init_app(app)
 
@@ -36,17 +42,54 @@ def remove_book(book_id):  # Remove a book
     return result.json()
 
 
-@app.route('/reserve', methods=['POST'])
-def reserve_book():  # Reserve a book or cancel a reservation
-    # data = request.get_json()
-    # book_id = data['book_id']
-    # if not books[book_id]['active']:
-    #     return jsonify({"message": "book not available"})
+@app.route('/borrow', methods=['POST'])
+def borrow_book():  # Borrow a book
+    data = request.get_json()
+
+    user_id = data['user_id']
+    user = User.query.filter_by(id=user_id).first()
+    if not user.borrower:
+        return {'message': 'cannot borrow book'}
+
+    book_id = data['book_id']
+    book = Book.query.filter_by(id=book_id).first()
+
+    if not book.check_availability():
+        return {'message': 'book not available'}
+
+    lending = Lending(book_id, data['user_id'])
+    lending.save_to_db()
+    return lending.json()
+
+
+@app.route('/return', methods=['POST'])
+def return_book():  # Return a book
     pass
 
 
-@app.route('/lend', methods=['POST'])
-def lend_book():  # Lend or return a book
+@app.route('/reserve', methods=['POST'])
+def reserve_book():  # Reserve a book
+    data = request.get_json()
+
+    user_id = data['user_id']
+    user = User.query.filter_by(id=user_id).first()
+    if not user.borrower:
+        return {'message': 'cannot reserve book'}
+
+    book_id = data['book_id']
+    book = Book.query.filter_by(id=book_id).first()
+
+    if not book.check_availability():
+        return {'message': 'book not available'}
+
+    reservation = Reservation(book_id, data['user_id'])
+    reservation.save_to_db()
+
+    return reservation.json()
+
+
+@app.route('/cancel', methods=['POST'])
+def cancel_reservation():  # Cancel a reservation
     pass
 
 
