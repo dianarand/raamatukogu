@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_jwt import JWT, jwt_required
+from flask_jwt import JWT, jwt_required, current_identity
 
 from db import db
 from models import Book, Lending, Reservation, User
@@ -30,6 +30,8 @@ def get_book_list():  # Get a list of books
 @app.route('/books', methods=['POST'])
 @jwt_required()
 def add_book():  # Create a new book
+    if not current_identity.lender:
+        return {'message': 'not authorized'}, 401
     data = request.get_json()
     book = Book(data['title'], data['author'], data['year'], 1)
     book.save_to_db()
@@ -46,6 +48,8 @@ def get_book(book_id):  # Get a book
 @app.route('/book/<int:book_id>', methods=['DELETE'])
 @jwt_required()
 def remove_book(book_id):  # Remove a book
+    if not current_identity.lender:
+        return {'message': 'not authorized'}, 401
     result = Book.query.filter_by(id=book_id).first()
     result.active = 0
     result.save_to_db()
@@ -57,10 +61,8 @@ def remove_book(book_id):  # Remove a book
 def borrow_book():  # Borrow a book
     data = request.get_json()
 
-    user_id = data['user_id']
-    user = User.query.filter_by(id=user_id).first()
-    if not user.borrower:
-        return {'message': 'cannot borrow book'}
+    if not current_identity.lender:
+        return {'message': 'not authorized'}, 401
 
     book_id = data['book_id']
     book = Book.query.filter_by(id=book_id).first()
@@ -84,10 +86,8 @@ def return_book():  # Return a book
 def reserve_book():  # Reserve a book
     data = request.get_json()
 
-    user_id = data['user_id']
-    user = User.query.filter_by(id=user_id).first()
-    if not user.borrower:
-        return {'message': 'cannot reserve book'}
+    if not current_identity.lender:
+        return {'message': 'not authorized'}, 401
 
     book_id = data['book_id']
     book = Book.query.filter_by(id=book_id).first()
