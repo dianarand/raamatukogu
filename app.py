@@ -1,18 +1,14 @@
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import generate_password_hash
-from datetime import timedelta
 
 from db import db
+from config import Config
 from models import Book, Lending, Reservation, User
 from security import authenticate, identity
 
 app = Flask(__name__)
-app.secret_key = 'DIANA'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_AUTH_URL_RULE'] = '/login'
-app.config['JWT_EXPIRATION_DELTA'] = timedelta(minutes=30)
+app.config.from_object(Config)
 
 
 @app.before_first_request
