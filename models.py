@@ -121,8 +121,7 @@ class User(db.Model):
     lender = db.Column(db.Integer)
     borrower = db.Column(db.Integer)
 
-    def __init__(self, _id, username, password, lender, borrower):
-        self.id = _id
+    def __init__(self, username, password, lender, borrower):
         self.username = username
         self.password = password
         self.lender = lender

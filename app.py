@@ -1,8 +1,12 @@
 from flask import Flask, request
+from flask_jwt import JWT, jwt_required
+
 from db import db
 from models import Book, Lending, Reservation, User
+from security import authenticate, identity
 
 app = Flask(__name__)
+app.secret_key = 'DIANA'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -14,13 +18,17 @@ def create_tables():
 
 db.init_app(app)
 
+jwt = JWT(app, authenticate, identity)
+
 
 @app.route('/books', methods=['GET'])
+@jwt_required()
 def get_book_list():  # Get a list of books
     return {'items': [book.json() for book in Book.query.all()]}
 
 
 @app.route('/books', methods=['POST'])
+@jwt_required()
 def add_book():  # Create a new book
     data = request.get_json()
     book = Book(data['title'], data['author'], data['year'], 1)
@@ -29,12 +37,14 @@ def add_book():  # Create a new book
 
 
 @app.route('/book/<int:book_id>', methods=['GET'])
+@jwt_required()
 def get_book(book_id):  # Get a book
     result = Book.query.filter_by(id=book_id).first()
     return result.json()
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
+@jwt_required()
 def remove_book(book_id):  # Remove a book
     result = Book.query.filter_by(id=book_id).first()
     result.active = 0
@@ -43,6 +53,7 @@ def remove_book(book_id):  # Remove a book
 
 
 @app.route('/borrow', methods=['POST'])
+@jwt_required()
 def borrow_book():  # Borrow a book
     data = request.get_json()
 
@@ -63,11 +74,13 @@ def borrow_book():  # Borrow a book
 
 
 @app.route('/return', methods=['POST'])
+@jwt_required()
 def return_book():  # Return a book
     pass
 
 
 @app.route('/reserve', methods=['POST'])
+@jwt_required()
 def reserve_book():  # Reserve a book
     data = request.get_json()
 
@@ -89,6 +102,7 @@ def reserve_book():  # Reserve a book
 
 
 @app.route('/cancel', methods=['POST'])
+@jwt_required()
 def cancel_reservation():  # Cancel a reservation
     pass
 
