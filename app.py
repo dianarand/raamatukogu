@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required, current_identity
+from werkzeug.security import generate_password_hash
 from datetime import timedelta
 
 from db import db
@@ -123,7 +124,8 @@ def register_user():  # Create a new user
     elif data['role'] == 'borrower':
         lender = False
         borrower = True
-    user = User(username, data['password'], lender, borrower)
+    hashed_password = generate_password_hash(data['password'])
+    user = User(username, hashed_password, lender, borrower)
     user.save_to_db()
     return {'message': 'user created successfully'}, 201
 
