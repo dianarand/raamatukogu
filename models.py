@@ -126,3 +126,7 @@ class User(db.Model):
         self.password = password
         self.lender = lender
         self.borrower = borrower
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()

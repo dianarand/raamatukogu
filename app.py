@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required, current_identity
+from datetime import timedelta
 
 from db import db
 from models import Book, Lending, Reservation, User
@@ -9,6 +10,8 @@ app = Flask(__name__)
 app.secret_key = 'DIANA'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_AUTH_URL_RULE'] = '/login'
+app.config['JWT_EXPIRATION_DELTA'] = timedelta(minutes=30)
 
 
 @app.before_first_request
@@ -70,7 +73,7 @@ def borrow_book():  # Borrow a book
     if not book.check_availability():
         return {'message': 'book not available'}
 
-    lending = Lending(book_id, data['user_id'])
+    lending = Lending(book_id, current_identity.id)
     lending.save_to_db()
     return lending.json()
 
@@ -95,7 +98,7 @@ def reserve_book():  # Reserve a book
     if not book.check_availability():
         return {'message': 'book not available'}
 
-    reservation = Reservation(book_id, data['user_id'])
+    reservation = Reservation(book_id, current_identity.id)
     reservation.save_to_db()
 
     return reservation.json()
@@ -105,6 +108,24 @@ def reserve_book():  # Reserve a book
 @jwt_required()
 def cancel_reservation():  # Cancel a reservation
     pass
+
+
+@app.route('/register', methods=['POST'])
+def register_user():  # Create a new user
+    data = request.get_json()
+    username = data['username']
+    duplicates = User.query.filter_by(username=username).first()
+    if duplicates:
+        return {'message': 'username already in use'}
+    if data['role'] == 'lender':
+        lender = True
+        borrower = False
+    elif data['role'] == 'borrower':
+        lender = False
+        borrower = True
+    user = User(username, data['password'], lender, borrower)
+    user.save_to_db()
+    return {'message': 'user created successfully'}, 201
 
 
 if __name__ == '__main__':
