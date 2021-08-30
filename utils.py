@@ -1,3 +1,5 @@
+from datetime import date
+
 from models import Book, Lending
 
 

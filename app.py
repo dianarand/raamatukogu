@@ -5,7 +5,7 @@ from datetime import date
 
 from db import db
 from config import Config
-from models import Book, Lending, Reservation, User
+from models import Book, Reservation, User
 from utils import book_checkout
 from security import authenticate, identity
 
@@ -84,10 +84,24 @@ def borrow_book(book_id):  # Borrow a book
     return book_checkout(book_id, current_identity.id)
 
 
-@app.route('/return', methods=['POST'])
+@app.route('/book/<int:book_id>/return', methods=['POST'])
 @jwt_required()
-def return_book():  # Return a book
-    pass
+def return_book(book_id):  # Return a book
+    book = Book.query.filter_by(id=book_id).first()
+
+    current_lending = None
+
+    for lending in book.lendings.all():
+        if not lending.date_end:
+            current_lending = lending
+
+    if not current_lending:
+        return {'message': 'book has not been checked out'}, 400
+
+    current_lending.date_end = date.today()
+    current_lending.save_to_db()
+
+    return lending.json()
 
 
 @app.route('/reserve', methods=['POST'])
