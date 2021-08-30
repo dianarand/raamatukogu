@@ -71,7 +71,7 @@ def lend_book(book_id):  # Lend a book
     if not user.borrower:
         return {'message': 'invalid borrower'}, 400
 
-    for owned_book in user.owned_books.all():
+    for owned_book in current_identity.owned_books.all():
         if owned_book.id == book_id:
             return book_checkout(owned_book, borrower_id)
 
