@@ -4,7 +4,8 @@ from werkzeug.security import generate_password_hash
 
 from db import db
 from config import Config
-from models import Book, Lending, Reservation, User
+from models import Book, User
+from utils import checkout, reserve, release, print_book, save_to_db
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ jwt = JWT(app, authenticate, identity)
 @app.route('/books', methods=['GET'])
 @jwt_required()
 def get_book_list():  # Get a list of books
-    return {'items': [book.json() for book in Book.query.all()]}
+    return {'items': [print_book(book) for book in Book.query.all()]}
 
 
 @app.route('/books', methods=['POST'])
@@ -32,9 +33,17 @@ def get_book_list():  # Get a list of books
 def add_book():  # Create a new book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
+
     data = request.get_json()
-    book = Book(data['title'], data['author'], data['year'], 1)
-    book.save_to_db()
+    book = Book(
+        title=data['title'],
+        author=data['author'],
+        year=int(data['year']),
+        owner_id=current_identity.id
+    )
+
+    save_to_db(book)
+
     return {'message': 'book added successfully'}, 201
 
 
@@ -42,7 +51,7 @@ def add_book():  # Create a new book
 @jwt_required()
 def get_book(book_id):  # Get a book
     result = Book.query.filter_by(id=book_id).first()
-    return result.json()
+    return print_book(result)
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
@@ -50,79 +59,108 @@ def get_book(book_id):  # Get a book
 def remove_book(book_id):  # Remove a book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
-    result = Book.query.filter_by(id=book_id).first()
-    result.active = 0
-    result.save_to_db()
-    return result.json()
+
+    book = Book.query.filter_by(id=book_id).first()
+
+    if book.owner_id != current_identity.id:
+        return {'message': 'not authorized'}, 401
+
+    if not book.active:
+        return {'message': 'book already removed'}, 400
+
+    for reservation in book.reservations.all():
+        if not reservation.date_end:
+            release(book, current_identity.id, 'cancel')
+
+    book.active = False
+    save_to_db(book)
+
+    return print_book(book)
 
 
-@app.route('/borrow', methods=['POST'])
+@app.route('/book/<int:book_id>/lend', methods=['POST'])
 @jwt_required()
-def borrow_book():  # Borrow a book
+def lend_book(book_id):  # Lend a book
     data = request.get_json()
+    borrower_id = data['borrower_id']
 
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
 
-    book_id = data['book_id']
-    book = Book.query.filter_by(id=book_id).first()
+    user = User.query.filter_by(id=borrower_id).first()
 
-    if not book.check_availability():
-        return {'message': 'book not available'}
+    if not user.borrower:
+        return {'message': 'invalid borrower'}, 400
 
-    lending = Lending(book_id, current_identity.id)
-    lending.save_to_db()
-    return lending.json()
+    for owned_book in current_identity.owned_books.all():
+        if owned_book.id == book_id:
+            return checkout(owned_book, borrower_id)
+
+    return {'message': 'not authorized'}, 401
 
 
-@app.route('/return', methods=['POST'])
+@app.route('/book/<int:book_id>/borrow', methods=['POST'])
 @jwt_required()
-def return_book():  # Return a book
-    pass
-
-
-@app.route('/reserve', methods=['POST'])
-@jwt_required()
-def reserve_book():  # Reserve a book
-    data = request.get_json()
-
-    if not current_identity.lender:
+def borrow_book(book_id):  # Borrow a book
+    if not current_identity.borrower:
         return {'message': 'not authorized'}, 401
 
-    book_id = data['book_id']
     book = Book.query.filter_by(id=book_id).first()
 
-    if not book.check_availability():
-        return {'message': 'book not available'}
-
-    reservation = Reservation(book_id, current_identity.id)
-    reservation.save_to_db()
-
-    return reservation.json()
+    return checkout(book, current_identity.id)
 
 
-@app.route('/cancel', methods=['POST'])
+@app.route('/book/<int:book_id>/return', methods=['POST'])
 @jwt_required()
-def cancel_reservation():  # Cancel a reservation
-    pass
+def return_book(book_id):  # Return a book
+    book = Book.query.filter_by(id=book_id).first()
+    return release(book, current_identity.id, 'return')
+
+
+@app.route('/book/<int:book_id>/reserve', methods=['POST'])
+@jwt_required()
+def reserve_book(book_id):  # Reserve a book
+    if not current_identity.borrower:
+        return {'message': 'not authorized'}, 401
+
+    book = Book.query.filter_by(id=book_id).first()
+
+    return reserve(book, current_identity.id)
+
+
+@app.route('/book/<int:book_id>/cancel', methods=['POST'])
+@jwt_required()
+def cancel_reservation(book_id):  # Cancel a reservation
+    book = Book.query.filter_by(id=book_id).first()
+    return release(book, current_identity.id, 'cancel')
 
 
 @app.route('/register', methods=['POST'])
 def register_user():  # Create a new user
     data = request.get_json()
     username = data['username']
+
     duplicates = User.query.filter_by(username=username).first()
     if duplicates:
         return {'message': 'username already in use'}
+
     if data['role'] == 'lender':
         lender = True
         borrower = False
     elif data['role'] == 'borrower':
         lender = False
         borrower = True
+
     hashed_password = generate_password_hash(data['password'])
-    user = User(username, hashed_password, lender, borrower)
-    user.save_to_db()
+
+    user = User(
+        username=username,
+        password=hashed_password,
+        lender=lender,
+        borrower=borrower
+    )
+    save_to_db(user)
+
     return {'message': 'user created successfully'}, 201
 
 
