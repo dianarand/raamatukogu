@@ -91,6 +91,20 @@ def print_book(book):  # return book information to JSON
     }
 
 
+def print_book_list(books):
+    book_list = []
+    for book in books:
+        book_data = print_book(book)
+        overtime = False
+        for lending in book.lendings:
+            if lending.date_end:
+                if lending.date_end > lending.deadline:
+                    overtime = True
+        book_data.update({'overtime': overtime})
+        book_list.append(book_data)
+    return {'books': book_list}
+
+
 def print_usage(usage):  # return lending or reservation information to JSON
     return {
         "book": usage.book.title,
