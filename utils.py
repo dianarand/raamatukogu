@@ -1,9 +1,9 @@
 from datetime import date
 
-from models import Lending
+from models import Lending, Reservation
 
 
-def book_checkout(book, borrower_id):
+def checkout(book, borrower_id):  # check a book out from the library
     if not book.active:
         return {'message': 'book unavailable'}, 400
 
@@ -24,17 +24,45 @@ def book_checkout(book, borrower_id):
     return lending.json()
 
 
-def book_checkin(book):
-    current_lending = None
+def release(book, user_id, usage):  # release a book from a user
+    current_use = None
+
+    if usage == 'return':
+        for lending in book.lendings.all():
+            if not lending.date_end:
+                current_use = lending
+        if not current_use:
+            return {'message': 'book is not checked out'}, 400
+
+    elif usage == 'cancel':
+        for reservation in book.reservations.all():
+            if not reservation.date_end:
+                current_use = reservation
+        if not current_use:
+            return {'message': 'book has not been reserved'}, 400
+
+    if user_id != book.owner_id and user_id != current_use.user_id:
+        return {'message': 'unauthorized'}, 401
+
+    current_use.date_end = date.today()
+    current_use.save_to_db()
+
+    return current_use.json()
+
+
+def reserve(book, user_id):
+    if not book.active:
+        return {'message': 'book unavailable'}, 400
 
     for lending in book.lendings.all():
         if not lending.date_end:
-            current_lending = lending
+            return {'message': 'book unavailable'}, 400
 
-    if not current_lending:
-        return {'message': 'book has not been checked out'}, 400
+    for reservation in book.reservations.all():
+        if not reservation.date_end:
+            return {'message': 'book unavailable'}, 400
 
-    current_lending.date_end = date.today()
-    current_lending.save_to_db()
+    reservation = Reservation(book.id, user_id)
+    reservation.save_to_db()
 
-    return lending.json()
+    return reservation.json()

@@ -4,8 +4,8 @@ from werkzeug.security import generate_password_hash
 
 from db import db
 from config import Config
-from models import Book, Reservation, User
-from utils import book_checkout, book_checkin
+from models import Book, User
+from utils import checkout, reserve, release
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -73,7 +73,7 @@ def lend_book(book_id):  # Lend a book
 
     for owned_book in current_identity.owned_books.all():
         if owned_book.id == book_id:
-            return book_checkout(owned_book, borrower_id)
+            return checkout(owned_book, borrower_id)
 
     return {'message': 'not authorized'}, 401
 
@@ -86,40 +86,32 @@ def borrow_book(book_id):  # Borrow a book
 
     book = Book.query.filter_by(id=book_id).first()
 
-    return book_checkout(book, current_identity.id)
+    return checkout(book, current_identity.id)
 
 
 @app.route('/book/<int:book_id>/return', methods=['POST'])
 @jwt_required()
 def return_book(book_id):  # Return a book
     book = Book.query.filter_by(id=book_id).first()
-    return book_checkin(book)
+    return release(book, current_identity.id, 'return')
 
 
-@app.route('/reserve', methods=['POST'])
+@app.route('/book/<int:book_id>/reserve', methods=['POST'])
 @jwt_required()
-def reserve_book():  # Reserve a book
-    data = request.get_json()
-
-    if not current_identity.lender:
+def reserve_book(book_id):  # Reserve a book
+    if not current_identity.borrower:
         return {'message': 'not authorized'}, 401
 
-    book_id = data['book_id']
     book = Book.query.filter_by(id=book_id).first()
 
-    if not book.check_availability():
-        return {'message': 'book not available'}
-
-    reservation = Reservation(book_id, current_identity.id)
-    reservation.save_to_db()
-
-    return reservation.json()
+    return reserve(book, current_identity.id)
 
 
-@app.route('/cancel', methods=['POST'])
+@app.route('/book/<int:book_id>/cancel', methods=['POST'])
 @jwt_required()
-def cancel_reservation():  # Cancel a reservation
-    pass
+def cancel_reservation(book_id):  # Cancel a reservation
+    book = Book.query.filter_by(id=book_id).first()
+    return release(book, current_identity.id, 'cancel')
 
 
 @app.route('/register', methods=['POST'])

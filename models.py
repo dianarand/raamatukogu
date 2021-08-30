@@ -109,6 +109,7 @@ class Reservation(db.Model):
             "book": self.book.title,
             "user": self.user.username,
             "date_begin": self.date_begin,
+            'date_end': self.date_end
         }
         return result
 
