@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from db import db
 from config import Config
 from models import Book, User
-from utils import checkout, reserve, release
+from utils import checkout, reserve, release, print_book, save_to_db
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -25,7 +25,7 @@ jwt = JWT(app, authenticate, identity)
 @app.route('/books', methods=['GET'])
 @jwt_required()
 def get_book_list():  # Get a list of books
-    return {'items': [book.json() for book in Book.query.all()]}
+    return {'items': [print_book(book) for book in Book.query.all()]}
 
 
 @app.route('/books', methods=['POST'])
@@ -33,9 +33,17 @@ def get_book_list():  # Get a list of books
 def add_book():  # Create a new book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
+
     data = request.get_json()
-    book = Book(data['title'], data['author'], data['year'], current_identity.id)
-    book.save_to_db()
+    book = Book(
+        title=data['title'],
+        author=data['author'],
+        year=int(data['year']),
+        owner_id=current_identity.id
+    )
+
+    save_to_db(book)
+
     return {'message': 'book added successfully'}, 201
 
 
@@ -43,7 +51,7 @@ def add_book():  # Create a new book
 @jwt_required()
 def get_book(book_id):  # Get a book
     result = Book.query.filter_by(id=book_id).first()
-    return result.json()
+    return print_book(result)
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
@@ -51,10 +59,12 @@ def get_book(book_id):  # Get a book
 def remove_book(book_id):  # Remove a book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
+
     result = Book.query.filter_by(id=book_id).first()
     result.active = 0
-    result.save_to_db()
-    return result.json()
+    save_to_db(result)
+
+    return print_book(result)
 
 
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
@@ -118,18 +128,28 @@ def cancel_reservation(book_id):  # Cancel a reservation
 def register_user():  # Create a new user
     data = request.get_json()
     username = data['username']
+
     duplicates = User.query.filter_by(username=username).first()
     if duplicates:
         return {'message': 'username already in use'}
+
     if data['role'] == 'lender':
         lender = True
         borrower = False
     elif data['role'] == 'borrower':
         lender = False
         borrower = True
+
     hashed_password = generate_password_hash(data['password'])
-    user = User(username, hashed_password, lender, borrower)
-    user.save_to_db()
+
+    user = User(
+        username=username,
+        password=hashed_password,
+        lender=lender,
+        borrower=borrower
+    )
+    save_to_db(user)
+
     return {'message': 'user created successfully'}, 201
 
 

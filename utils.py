@@ -1,5 +1,6 @@
 from datetime import date
 
+from db import db
 from models import Lending, Reservation
 
 
@@ -18,10 +19,34 @@ def checkout(book, borrower_id):  # check a book out from the library
             else:
                 return {'message': 'book unavailable'}, 400
 
-    lending = Lending(book.id, borrower_id)
-    lending.save_to_db()
+    lending = Lending(
+        book_id=book.id,
+        user_id=borrower_id
+    )
+    save_to_db(lending)
 
-    return lending.json()
+    return print_usage(lending)
+
+
+def reserve(book, user_id):
+    if not book.active:
+        return {'message': 'book unavailable'}, 400
+
+    for lending in book.lendings.all():
+        if not lending.date_end:
+            return {'message': 'book unavailable'}, 400
+
+    for reservation in book.reservations.all():
+        if not reservation.date_end:
+            return {'message': 'book unavailable'}, 400
+
+    reservation = Reservation(
+        book_id=book.id,
+        user_id=user_id
+    )
+    save_to_db(reservation)
+
+    return print_usage(reservation)
 
 
 def release(book, user_id, usage):  # release a book from a user
@@ -45,24 +70,32 @@ def release(book, user_id, usage):  # release a book from a user
         return {'message': 'unauthorized'}, 401
 
     current_use.date_end = date.today()
-    current_use.save_to_db()
+    save_to_db(current_use)
 
     return current_use.json()
 
 
-def reserve(book, user_id):
-    if not book.active:
-        return {'message': 'book unavailable'}, 400
+def print_book(book):  # return book information to JSON
+    return {
+        'id': book.id,
+        'title': book.title,
+        'author': book.author,
+        'year': book.year,
+        'owner': book.owner.username,
+        'active': book.active
+    }
 
-    for lending in book.lendings.all():
-        if not lending.date_end:
-            return {'message': 'book unavailable'}, 400
 
-    for reservation in book.reservations.all():
-        if not reservation.date_end:
-            return {'message': 'book unavailable'}, 400
+def print_usage(usage):  # return lending or reservation information to JSON
+    return {
+        "book": usage.book.title,
+        "user": usage.user.username,
+        "date_begin": usage.date_begin,
+        "date_end": usage.date_end
+    }
+    # ADD DEADLINE!
 
-    reservation = Reservation(book.id, user_id)
-    reservation.save_to_db()
 
-    return reservation.json()
+def save_to_db(item):  # save any object to database
+    db.session.add(item)
+    db.session.commit()
