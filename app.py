@@ -60,11 +60,22 @@ def remove_book(book_id):  # Remove a book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
 
-    result = Book.query.filter_by(id=book_id).first()
-    result.active = 0
-    save_to_db(result)
+    book = Book.query.filter_by(id=book_id).first()
 
-    return print_book(result)
+    if book.owner_id != current_identity.id:
+        return {'message': 'not authorized'}, 401
+
+    if not book.active:
+        return {'message': 'book already removed'}, 400
+
+    for reservation in book.reservations.all():
+        if not reservation.date_end:
+            release(book, current_identity.id, 'cancel')
+
+    book.active = False
+    save_to_db(book)
+
+    return print_book(book)
 
 
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
