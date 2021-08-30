@@ -77,7 +77,7 @@ def release(book, user_id, usage):  # release a book from a user
     current_use.date_end = date.today()
     save_to_db(current_use)
 
-    return current_use.json()
+    return print_usage(current_use)
 
 
 def print_book(book):  # return book information to JSON
