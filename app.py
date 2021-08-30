@@ -1,10 +1,12 @@
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import generate_password_hash
+from datetime import date
 
 from db import db
 from config import Config
 from models import Book, Lending, Reservation, User
+from utils import book_checkout
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -56,29 +58,21 @@ def remove_book(book_id):  # Remove a book
     return result.json()
 
 
-# WORK IN PROGRESS
-# @app.route('/book/<int:book_id>/lend', methods=['POST'])
-# @jwt_required()
-# def lend_book(book_id):  # Borrow a book
-#     data = request.get_json()
-#     borrower_id = data['borrower_id']
-#
-#     if not current_identity.lender:
-#         return {'message': 'not authorized'}, 401
-#
-#     user = User.query.filter_by(id=borrower_id).first()
-#
-#     if not user.borrower:
-#         return {'message': 'invalid borrower'}, 400
-#
-#     book = Book.query.filter_by(id=book_id).first()
-#
-#     if not book.check_availability():
-#         return {'message': 'book not available'}, 400
-#
-#     lending = Lending(book_id, current_identity.id)
-#     lending.save_to_db()
-#     return lending.json()
+@app.route('/book/<int:book_id>/lend', methods=['POST'])
+@jwt_required()
+def lend_book(book_id):  # Lend a book
+    data = request.get_json()
+    borrower_id = data['borrower_id']
+
+    if not current_identity.lender:
+        return {'message': 'not authorized'}, 401
+
+    user = User.query.filter_by(id=borrower_id).first()
+
+    if not user.borrower:
+        return {'message': 'invalid borrower'}, 400
+
+    return book_checkout(book_id, borrower_id)
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])
@@ -87,14 +81,7 @@ def borrow_book(book_id):  # Borrow a book
     if not current_identity.borrower:
         return {'message': 'not authorized'}, 401
 
-    book = Book.query.filter_by(id=book_id).first()
-
-    if not book.check_availability():
-        return {'message': 'book not available'}
-
-    lending = Lending(book_id, current_identity.id)
-    lending.save_to_db()
-    return lending.json()
+    return book_checkout(book_id, current_identity.id)
 
 
 @app.route('/return', methods=['POST'])
