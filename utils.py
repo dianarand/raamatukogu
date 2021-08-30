@@ -3,21 +3,23 @@ from datetime import date
 from db import db
 from models import Lending, Reservation
 
+unavailable_message = {'message': 'book unavailable'}
+
 
 def checkout(book, borrower_id):  # check a book out from the library
     if not book.active:
-        return {'message': 'book unavailable'}, 400
+        return unavailable_message, 400
 
     for lending in book.lendings.all():
         if not lending.date_end:
-            return {'message': 'book unavailable'}, 400
+            return unavailable_message, 400
 
     for reservation in book.reservations.all():
         if not reservation.date_end:
             if reservation.user_id == borrower_id:
                 reservation.date_end = date.today()
             else:
-                return {'message': 'book unavailable'}, 400
+                return unavailable_message, 400
 
     lending = Lending(
         book_id=book.id,
@@ -25,20 +27,23 @@ def checkout(book, borrower_id):  # check a book out from the library
     )
     save_to_db(lending)
 
-    return print_usage(lending)
+    lending_json = print_usage(lending)
+    lending_json.update({'deadline': lending.deadline})
+
+    return lending_json
 
 
 def reserve(book, user_id):
     if not book.active:
-        return {'message': 'book unavailable'}, 400
+        return unavailable_message, 400
 
     for lending in book.lendings.all():
         if not lending.date_end:
-            return {'message': 'book unavailable'}, 400
+            return unavailable_message, 400
 
     for reservation in book.reservations.all():
         if not reservation.date_end:
-            return {'message': 'book unavailable'}, 400
+            return unavailable_message, 400
 
     reservation = Reservation(
         book_id=book.id,
@@ -93,7 +98,6 @@ def print_usage(usage):  # return lending or reservation information to JSON
         "date_begin": usage.date_begin,
         "date_end": usage.date_end
     }
-    # ADD DEADLINE!
 
 
 def save_to_db(item):  # save any object to database
