@@ -126,6 +126,8 @@ class User(db.Model):
     lender = db.Column(db.Integer)
     borrower = db.Column(db.Integer)
 
+    owned_books = db.relationship('Book', lazy='dynamic')
+
     def __init__(self, username, password, lender, borrower):
         self.username = username
         self.password = password

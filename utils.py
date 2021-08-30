@@ -1,11 +1,9 @@
 from datetime import date
 
-from models import Book, Lending
+from models import Lending
 
 
-def book_checkout(book_id, borrower_id):
-    book = Book.query.filter_by(id=book_id).first()
-
+def book_checkout(book, borrower_id):
     if not book.active:
         return {'message': 'book unavailable'}, 400
 
@@ -20,7 +18,23 @@ def book_checkout(book_id, borrower_id):
             else:
                 return {'message': 'book unavailable'}, 400
 
-    lending = Lending(book_id, borrower_id)
+    lending = Lending(book.id, borrower_id)
     lending.save_to_db()
+
+    return lending.json()
+
+
+def book_checkin(book):
+    current_lending = None
+
+    for lending in book.lendings.all():
+        if not lending.date_end:
+            current_lending = lending
+
+    if not current_lending:
+        return {'message': 'book has not been checked out'}, 400
+
+    current_lending.date_end = date.today()
+    current_lending.save_to_db()
 
     return lending.json()

@@ -1,12 +1,11 @@
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import generate_password_hash
-from datetime import date
 
 from db import db
 from config import Config
 from models import Book, Reservation, User
-from utils import book_checkout
+from utils import book_checkout, book_checkin
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -72,7 +71,11 @@ def lend_book(book_id):  # Lend a book
     if not user.borrower:
         return {'message': 'invalid borrower'}, 400
 
-    return book_checkout(book_id, borrower_id)
+    for owned_book in user.owned_books.all():
+        if owned_book.id == book_id:
+            return book_checkout(owned_book, borrower_id)
+
+    return {'message': 'not authorized'}, 401
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])
@@ -81,27 +84,16 @@ def borrow_book(book_id):  # Borrow a book
     if not current_identity.borrower:
         return {'message': 'not authorized'}, 401
 
-    return book_checkout(book_id, current_identity.id)
+    book = Book.query.filter_by(id=book_id).first()
+
+    return book_checkout(book, current_identity.id)
 
 
 @app.route('/book/<int:book_id>/return', methods=['POST'])
 @jwt_required()
 def return_book(book_id):  # Return a book
     book = Book.query.filter_by(id=book_id).first()
-
-    current_lending = None
-
-    for lending in book.lendings.all():
-        if not lending.date_end:
-            current_lending = lending
-
-    if not current_lending:
-        return {'message': 'book has not been checked out'}, 400
-
-    current_lending.date_end = date.today()
-    current_lending.save_to_db()
-
-    return lending.json()
+    return book_checkin(book)
 
 
 @app.route('/reserve', methods=['POST'])
