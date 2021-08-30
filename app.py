@@ -25,7 +25,27 @@ jwt = JWT(app, authenticate, identity)
 @app.route('/books', methods=['GET'])
 @jwt_required()
 def get_book_list():  # Get a list of books
-    return {'items': [print_book(book) for book in Book.query.all()]}
+    query = request.args
+    keys = query.keys()
+    result = None
+    search = lambda x: '%{}%'.format(x)
+    if 'title' in keys:
+        result = Book.query.filter(Book.title.like(search(query['title'])))
+    if 'author' in keys:
+        author = query['author']
+        if not result:
+            result = Book.query.filter(Book.author.like(search(author)))
+        else:
+            result = result.filter(Book.author.like(search(author)))
+    if 'year' in keys:
+        year = int(query['year'])
+        if not result:
+            result = Book.query.filter_by(year=year)
+        else:
+            result = result.filter_by(year=year)
+    if not result:
+        result = Book.query
+    return {'items': [print_book(book) for book in result.all()]}
 
 
 @app.route('/books', methods=['POST'])
