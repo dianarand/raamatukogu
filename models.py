@@ -11,14 +11,18 @@ class Book(db.Model):
     year = db.Column(db.Integer)
     active = db.Column(db.Integer)
 
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    owner = db.relationship('User')
+
     lendings = db.relationship('Lending', lazy='dynamic')
     reservations = db.relationship('Reservation', lazy='dynamic')
 
-    def __init__(self, title, author, year, active):
+    def __init__(self, title, author, year, owner_id):
         self.title = title
         self.author = author
         self.year = year
-        self.active = active
+        self.owner_id = owner_id
+        self.active = 1
 
     def json(self):
         result = {
@@ -26,6 +30,7 @@ class Book(db.Model):
             'title': self.title,
             'author': self.author,
             'year': self.year,
+            'owner': self.owner.username,
             'active': bool(self.active)
         }
         return result

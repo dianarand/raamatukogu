@@ -33,7 +33,7 @@ def add_book():  # Create a new book
     if not current_identity.lender:
         return {'message': 'not authorized'}, 401
     data = request.get_json()
-    book = Book(data['title'], data['author'], data['year'], 1)
+    book = Book(data['title'], data['author'], data['year'], current_identity.id)
     book.save_to_db()
     return {'message': 'book added successfully'}, 201
 
@@ -56,15 +56,37 @@ def remove_book(book_id):  # Remove a book
     return result.json()
 
 
-@app.route('/borrow', methods=['POST'])
-@jwt_required()
-def borrow_book():  # Borrow a book
-    data = request.get_json()
+# WORK IN PROGRESS
+# @app.route('/book/<int:book_id>/lend', methods=['POST'])
+# @jwt_required()
+# def lend_book(book_id):  # Borrow a book
+#     data = request.get_json()
+#     borrower_id = data['borrower_id']
+#
+#     if not current_identity.lender:
+#         return {'message': 'not authorized'}, 401
+#
+#     user = User.query.filter_by(id=borrower_id).first()
+#
+#     if not user.borrower:
+#         return {'message': 'invalid borrower'}, 400
+#
+#     book = Book.query.filter_by(id=book_id).first()
+#
+#     if not book.check_availability():
+#         return {'message': 'book not available'}, 400
+#
+#     lending = Lending(book_id, current_identity.id)
+#     lending.save_to_db()
+#     return lending.json()
 
-    if not current_identity.lender:
+
+@app.route('/book/<int:book_id>/borrow', methods=['POST'])
+@jwt_required()
+def borrow_book(book_id):  # Borrow a book
+    if not current_identity.borrower:
         return {'message': 'not authorized'}, 401
 
-    book_id = data['book_id']
     book = Book.query.filter_by(id=book_id).first()
 
     if not book.check_availability():
