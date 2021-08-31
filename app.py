@@ -6,6 +6,7 @@ from db import db
 from config import Config
 from models import Book, User
 from utils import checkout, reserve, release, print_book, print_book_list, save_to_db
+from search import by_title, by_author, by_year, by_filter
 from security import authenticate, identity
 
 app = Flask(__name__)
@@ -28,51 +29,17 @@ def get_book_list():  # Get a list of books
     query = request.args
     keys = query.keys()
     result = None
-    search = lambda x: '%{}%'.format(x)
     if 'title' in keys:
-        result = Book.query.filter(Book.title.like(search(query['title'])))
+        result = by_title(result, query['title'])
     if 'author' in keys:
-        author = query['author']
-        if not result:
-            result = Book.query.filter(Book.author.like(search(author)))
-        else:
-            result = result.filter(Book.author.like(search(author)))
+        result = by_author(result, query['author'])
     if 'year' in keys:
-        year = int(query['year'])
-        if not result:
-            result = Book.query.filter_by(year=year)
-        else:
-            result = result.filter_by(year=year)
+        result = by_year(result, query['year'])
     if 'filter' in keys:
-        fltr = query['filter']
-        if fltr == 'owned_by_me':
-            if not result:
-                result = Book.query.filter_by(owner_id=current_identity.id)
-            else:
-                result = result.filter_by(owner_id=current_identity.id)
-        elif fltr == 'borrowed_by_me':
-            new_result = []
-            if not result:
-                result = Book.query
-            for book in result.all():
-                for lending in book.lendings:
-                    if not lending.date_end and lending.user_id == current_identity.id:
-                        new_result.append(book)
-                        break
-            return print_book_list(new_result)
-        elif fltr == 'reserved_by_me':
-            new_result = []
-            if not result:
-                result = Book.query
-            for book in result.all():
-                for reservation in book.reservations:
-                    if not reservation.date_end and reservation.user_id == current_identity.id:
-                        new_result.append(book)
-                        break
-            return print_book_list(new_result)
+        result = by_filter(result, query['filter'], current_identity.id)
     if not result:
         result = Book.query
-    return print_book_list(result.all())
+    return print_book_list(result.all(), True)
 
 
 @app.route('/books', methods=['POST'])
