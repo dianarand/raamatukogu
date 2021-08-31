@@ -1,31 +1,31 @@
-from flask import Flask, request
-from flask_jwt import JWT, jwt_required, current_identity
+from flask import request
+from flask_jwt import jwt_required, current_identity
 from werkzeug.security import generate_password_hash
 
-from db import db
-from config import Config
-from models import Book, User
-from utils import checkout, reserve, release, print_book, save_to_db
-from security import authenticate, identity
+from app import app
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-
-db.init_app(app)
-
-jwt = JWT(app, authenticate, identity)
+from app.models import Book, User
+from app.search import by_title, by_author, by_year, by_filter
+from app.utils import checkout, reserve, release, print_book, print_book_list, save_to_db
 
 
 @app.route('/books', methods=['GET'])
 @jwt_required()
 def get_book_list():  # Get a list of books
-    return {'items': [print_book(book) for book in Book.query.all()]}
+    query = request.args
+    keys = query.keys()
+    result = None
+    if 'title' in keys:
+        result = by_title(result, query['title'])
+    if 'author' in keys:
+        result = by_author(result, query['author'])
+    if 'year' in keys:
+        result = by_year(result, query['year'])
+    if 'filter' in keys:
+        result = by_filter(result, query['filter'], current_identity.id)
+    if not result:
+        result = Book.query
+    return print_book_list(result.all(), True)
 
 
 @app.route('/books', methods=['POST'])
@@ -68,9 +68,7 @@ def remove_book(book_id):  # Remove a book
     if not book.active:
         return {'message': 'book already removed'}, 400
 
-    for reservation in book.reservations.all():
-        if not reservation.date_end:
-            release(book, current_identity.id, 'cancel')
+    release(book, current_identity.id, 'cancel')
 
     book.active = False
     save_to_db(book)
@@ -92,9 +90,9 @@ def lend_book(book_id):  # Lend a book
     if not user.borrower:
         return {'message': 'invalid borrower'}, 400
 
-    for owned_book in current_identity.owned_books.all():
-        if owned_book.id == book_id:
-            return checkout(owned_book, borrower_id)
+    book = current_identity.owned_books.filter_by(id=book_id).first()
+    if book:
+        return checkout(book, borrower_id)
 
     return {'message': 'not authorized'}, 401
 
@@ -162,7 +160,3 @@ def register_user():  # Create a new user
     save_to_db(user)
 
     return {'message': 'user created successfully'}, 201
-
-
-if __name__ == '__main__':
-    app.run(debug=True)

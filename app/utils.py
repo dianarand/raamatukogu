@@ -1,25 +1,21 @@
 from datetime import date
 
-from db import db
-from models import Lending, Reservation
+from app.db import db
+from app.models import Lending, Reservation
 
 unavailable_message = {'message': 'book unavailable'}
 
 
 def checkout(book, borrower_id):  # check a book out from the library
-    if not book.active:
+    if not book.active or get_active_lending(book):
         return unavailable_message, 400
 
-    for lending in book.lendings.all():
-        if not lending.date_end:
+    reservation = get_active_reservation(book)
+    if reservation:
+        if reservation.user_id == borrower_id:
+            reservation.date_end = date.today()
+        else:
             return unavailable_message, 400
-
-    for reservation in book.reservations.all():
-        if not reservation.date_end:
-            if reservation.user_id == borrower_id:
-                reservation.date_end = date.today()
-            else:
-                return unavailable_message, 400
 
     lending = Lending(
         book_id=book.id,
@@ -34,16 +30,8 @@ def checkout(book, borrower_id):  # check a book out from the library
 
 
 def reserve(book, user_id):
-    if not book.active:
+    if not book.active or get_active_lending(book) or get_active_reservation(book):
         return unavailable_message, 400
-
-    for lending in book.lendings.all():
-        if not lending.date_end:
-            return unavailable_message, 400
-
-    for reservation in book.reservations.all():
-        if not reservation.date_end:
-            return unavailable_message, 400
 
     reservation = Reservation(
         book_id=book.id,
@@ -55,19 +43,13 @@ def reserve(book, user_id):
 
 
 def release(book, user_id, usage):  # release a book from a user
-    current_use = None
-
     if usage == 'return':
-        for lending in book.lendings.all():
-            if not lending.date_end:
-                current_use = lending
+        current_use = get_active_lending(book)
         if not current_use:
             return {'message': 'book is not checked out'}, 400
 
     elif usage == 'cancel':
-        for reservation in book.reservations.all():
-            if not reservation.date_end:
-                current_use = reservation
+        current_use = get_active_reservation(book)
         if not current_use:
             return {'message': 'book has not been reserved'}, 400
 
@@ -89,6 +71,32 @@ def print_book(book):  # return book information to JSON
         'owner': book.owner.username,
         'active': book.active
     }
+
+
+def get_active_lending(book):
+    return book.lendings.filter_by(date_end=None).first()
+
+
+def get_active_reservation(book):
+    return book.reservations.filter_by(date_end=None).first()
+
+
+def print_book_list(books, check_overtime=False):
+    book_list = []
+    for book in books:
+        book_data = print_book(book)
+
+        if check_overtime:
+            overtime = False
+            lending = get_active_lending(book)
+            if lending:
+                if lending.deadline < date.today():
+                    overtime = True
+            book_data.update({'overtime': overtime})
+
+        book_list.append(book_data)
+
+    return {'books': book_list}
 
 
 def print_usage(usage):  # return lending or reservation information to JSON
