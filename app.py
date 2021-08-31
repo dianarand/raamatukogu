@@ -82,9 +82,7 @@ def remove_book(book_id):  # Remove a book
     if not book.active:
         return {'message': 'book already removed'}, 400
 
-    for reservation in book.reservations.all():
-        if not reservation.date_end:
-            release(book, current_identity.id, 'cancel')
+    release(book, current_identity.id, 'cancel')
 
     book.active = False
     save_to_db(book)
@@ -106,9 +104,9 @@ def lend_book(book_id):  # Lend a book
     if not user.borrower:
         return {'message': 'invalid borrower'}, 400
 
-    for owned_book in current_identity.owned_books.all():
-        if owned_book.id == book_id:
-            return checkout(owned_book, borrower_id)
+    book = current_identity.owned_books.filter_by(id=book_id).first()
+    if book:
+        return checkout(book, borrower_id)
 
     return {'message': 'not authorized'}, 401
 
