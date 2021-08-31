@@ -45,7 +45,7 @@ def books_reserved_by_me(curr_result, user_id):
 
 
 def searchf(arg):
-    return '%{}%'.format(arg)
+    return f'%{arg}%'
 
 
 def query_setup(curr_result):

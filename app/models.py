@@ -12,10 +12,9 @@ class Book(db.Model):
     active = db.Column(db.Boolean, default=True)
 
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    owner = db.relationship('User')
 
-    lendings = db.relationship('Lending', lazy='dynamic')
-    reservations = db.relationship('Reservation', lazy='dynamic')
+    lendings = db.relationship('Lending', backref='book', lazy='dynamic')
+    reservations = db.relationship('Reservation', backref='book', lazy='dynamic')
 
 
 class Lending(db.Model):
@@ -24,7 +23,6 @@ class Lending(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
-    book = db.relationship('Book')
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User')
@@ -40,7 +38,6 @@ class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
-    book = db.relationship('Book')
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User')
@@ -58,4 +55,4 @@ class User(db.Model):
     lender = db.Column(db.Boolean)
     borrower = db.Column(db.Boolean)
 
-    owned_books = db.relationship('Book', lazy='dynamic')
+    owned_books = db.relationship('Book', backref='owner', lazy='dynamic')
