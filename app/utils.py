@@ -1,7 +1,7 @@
 from datetime import date
 
-from db import db
-from models import Lending, Reservation
+from app.db import db
+from app.models import Lending, Reservation
 
 unavailable_message = {'message': 'book unavailable'}
 

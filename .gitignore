@@ -1,6 +1,6 @@
 /.idea/
 /venv/
-/__pycache__/
-/static/
-/templates/
+/app/static/
+/app/templates/
+/app/__pycache__/
 data.db

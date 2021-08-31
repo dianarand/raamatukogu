@@ -1,4 +1,4 @@
-from models import Book, Lending, Reservation
+from app.models import Book, Lending, Reservation
 
 
 def by_title(curr_result, title):

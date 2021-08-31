@@ -1,26 +1,12 @@
-from flask import Flask, request
-from flask_jwt import JWT, jwt_required, current_identity
+from flask import request
+from flask_jwt import jwt_required, current_identity
 from werkzeug.security import generate_password_hash
 
-from db import db
-from config import Config
-from models import Book, User
-from utils import checkout, reserve, release, print_book, print_book_list, save_to_db
-from search import by_title, by_author, by_year, by_filter
-from security import authenticate, identity
+from app import app
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-
-db.init_app(app)
-
-jwt = JWT(app, authenticate, identity)
+from app.models import Book, User
+from app.search import by_title, by_author, by_year, by_filter
+from app.utils import checkout, reserve, release, print_book, print_book_list, save_to_db
 
 
 @app.route('/books', methods=['GET'])
@@ -174,7 +160,3 @@ def register_user():  # Create a new user
     save_to_db(user)
 
     return {'message': 'user created successfully'}, 201
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
