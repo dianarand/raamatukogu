@@ -113,7 +113,7 @@ class UtilitiesTest(BaseTest):
         with self.app_context():
             book = Book.query.first()
 
-            # Attempt to cancel a lending on a book that has not been lent
+            # Attempt to return a book that has not been lent
             expected1 = {'message': 'book is not checked out'}
             response = ut.release(book, 1, 'return')
             self.assertDictEqual(response[0], expected1,
