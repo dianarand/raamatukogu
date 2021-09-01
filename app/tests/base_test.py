@@ -1,18 +1,22 @@
 from unittest import TestCase
 from app import app
 from app.db import db
-from app.models import Book, Lending, Reservation, User
+from app.models import Book, User
 
 
 class BaseTest(TestCase):
-    def setUp(self):
-        # Create a database
+    @classmethod
+    def setUpClass(cls):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
         with app.app_context():
             db.init_app(app)
+
+    def setUp(self):
+        # Create a database
+        with app.app_context():
             db.create_all()
         # Create a test client
-        self.app = app.test_client()
+        self.app = app.test_client
         self.app_context = app.app_context
         # Initialise some test data
         with app.app_context():

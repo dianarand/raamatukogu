@@ -59,7 +59,7 @@ def release(book, user_id, usage):  # release a book from a user
     current_use.date_end = date.today()
     save_to_db(current_use)
 
-    return print_usage(current_use), 200
+    return print_usage(current_use)
 
 
 def get_active_lending(book):
