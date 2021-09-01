@@ -62,6 +62,14 @@ def release(book, user_id, usage):  # release a book from a user
     return print_usage(current_use)
 
 
+def get_active_lending(book):
+    return book.lendings.filter_by(date_end=None).first()
+
+
+def get_active_reservation(book):
+    return book.reservations.filter_by(date_end=None).first()
+
+
 def print_book(book):  # return book information to JSON
     return {
         'id': book.id,
@@ -71,14 +79,6 @@ def print_book(book):  # return book information to JSON
         'owner': book.owner.username,
         'active': book.active
     }
-
-
-def get_active_lending(book):
-    return book.lendings.filter_by(date_end=None).first()
-
-
-def get_active_reservation(book):
-    return book.reservations.filter_by(date_end=None).first()
 
 
 def print_book_list(books, check_overtime=False):
@@ -101,10 +101,10 @@ def print_book_list(books, check_overtime=False):
 
 def print_usage(usage):  # return lending or reservation information to JSON
     return {
-        "book": usage.book.title,
-        "user": usage.user.username,
-        "date_begin": usage.date_begin,
-        "date_end": usage.date_end
+        'book': usage.book.title,
+        'user': usage.user.username,
+        'date_begin': usage.date_begin,
+        'date_end': usage.date_end
     }
 
 

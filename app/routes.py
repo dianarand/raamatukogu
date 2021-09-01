@@ -32,15 +32,18 @@ def get_book_list():  # Get a list of books
 @jwt_required()
 def add_book():  # Create a new book
     if not current_identity.lender:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     data = request.get_json()
-    book = Book(
-        title=data['title'],
-        author=data['author'],
-        year=int(data['year']),
-        owner_id=current_identity.id
-    )
+    try:
+        book = Book(
+            title=data['title'],
+            author=data['author'],
+            year=int(data['year']),
+            owner_id=current_identity.id
+        )
+    except KeyError:
+        return {'message': 'invalid data posted'}, 400
 
     save_to_db(book)
 
@@ -51,6 +54,8 @@ def add_book():  # Create a new book
 @jwt_required()
 def get_book(book_id):  # Get a book
     result = Book.query.filter_by(id=book_id).first()
+    if not result:
+        return {'message': 'book not found'}, 404
     return print_book(result)
 
 
@@ -58,12 +63,15 @@ def get_book(book_id):  # Get a book
 @jwt_required()
 def remove_book(book_id):  # Remove a book
     if not current_identity.lender:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     book = Book.query.filter_by(id=book_id).first()
 
+    if not book:
+        return {'message': 'book not found'}, 404
+
     if book.owner_id != current_identity.id:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     if not book.active:
         return {'message': 'book already removed'}, 400
@@ -73,19 +81,25 @@ def remove_book(book_id):  # Remove a book
     book.active = False
     save_to_db(book)
 
-    return print_book(book)
+    return {'message': 'book successfully removed'}
 
 
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
 @jwt_required()
 def lend_book(book_id):  # Lend a book
     data = request.get_json()
-    borrower_id = data['borrower_id']
+    try:
+        borrower_id = data['borrower_id']
+    except KeyError:
+        return {'message': 'invalid data'}, 400
 
     if not current_identity.lender:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     user = User.query.filter_by(id=borrower_id).first()
+
+    if not user:
+        return {'message': 'user not found'}, 404
 
     if not user.borrower:
         return {'message': 'invalid borrower'}, 400
@@ -94,16 +108,19 @@ def lend_book(book_id):  # Lend a book
     if book:
         return checkout(book, borrower_id)
 
-    return {'message': 'not authorized'}, 401
+    return {'message': 'book not found'}, 404
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])
 @jwt_required()
 def borrow_book(book_id):  # Borrow a book
     if not current_identity.borrower:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     book = Book.query.filter_by(id=book_id).first()
+
+    if not book:
+        return {'message': 'book not found'}, 404
 
     return checkout(book, current_identity.id)
 
@@ -112,6 +129,10 @@ def borrow_book(book_id):  # Borrow a book
 @jwt_required()
 def return_book(book_id):  # Return a book
     book = Book.query.filter_by(id=book_id).first()
+
+    if not book:
+        return {'message': 'book not found'}, 404
+
     return release(book, current_identity.id, 'return')
 
 
@@ -119,9 +140,12 @@ def return_book(book_id):  # Return a book
 @jwt_required()
 def reserve_book(book_id):  # Reserve a book
     if not current_identity.borrower:
-        return {'message': 'not authorized'}, 401
+        return {'message': 'unauthorized'}, 401
 
     book = Book.query.filter_by(id=book_id).first()
+
+    if not book:
+        return {'message': 'book not found'}, 404
 
     return reserve(book, current_identity.id)
 
@@ -130,6 +154,10 @@ def reserve_book(book_id):  # Reserve a book
 @jwt_required()
 def cancel_reservation(book_id):  # Cancel a reservation
     book = Book.query.filter_by(id=book_id).first()
+
+    if not book:
+        return {'message': 'book not found'}, 404
+
     return release(book, current_identity.id, 'cancel')
 
 
@@ -140,7 +168,7 @@ def register_user():  # Create a new user
 
     duplicates = User.query.filter_by(username=username).first()
     if duplicates:
-        return {'message': 'username already in use'}
+        return {'message': 'username already in use'}, 400
 
     if data['role'] == 'lender':
         lender = True
