@@ -20,30 +20,9 @@ class BaseTest(TestCase):
         self.app_context = app.app_context
         # Initialise some test data
         with app.app_context():
-            db.session.add(
-                User(
-                    username='Test Lender',
-                    password='password',
-                    lender=True,
-                    borrower=False
-                )
-            )
-            db.session.add(
-                User(
-                    username='Test Borrower',
-                    password='password',
-                    lender=False,
-                    borrower=True
-                )
-            )
-            db.session.add(
-                Book(
-                    title='Test Book',
-                    author='Test Author',
-                    year=2021,
-                    owner_id=1,
-                )
-            )
+            db.session.add(User(username='Test Lender', password='password', lender=True, borrower=False))
+            db.session.add(User(username='Test Borrower', password='password', lender=False, borrower=True))
+            db.session.add(Book(title='Test Book', author='Test Author', year=2021, owner_id=1))
             db.session.commit()
 
     def tearDown(self):
