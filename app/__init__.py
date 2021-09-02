@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_jwt import JWT
+import logging
 
 from app.db import db
 from app.config import Config
@@ -17,5 +18,12 @@ def create_tables():
 db.init_app(app)
 
 jwt = JWT(app, authenticate, identity)
+
+logging.basicConfig(
+    filename='app.log',
+    encoding='utf-8',
+    level=logging.INFO,
+    format='%(asctime)s : %(levelname)s : %(message)s'
+)
 
 from app import routes

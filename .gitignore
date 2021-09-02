@@ -3,4 +3,5 @@
 /app/static/
 /app/templates/
 /app/__pycache__/
-data.db
+/app/data.db
+app.log

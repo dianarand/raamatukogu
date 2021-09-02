@@ -1,5 +1,6 @@
 from datetime import date
 
+from app import app
 from app.db import db
 from app.models import Lending, Reservation
 
@@ -8,6 +9,7 @@ unavailable_message = {'message': 'book unavailable'}
 
 def checkout(book, borrower_id):  # check a book out from the library
     if not book.active or get_active_lending(book):
+        app.logger.info('FAIL : Book id={book.id} unavailable')
         return unavailable_message, 400
 
     reservation = get_active_reservation(book)
@@ -15,6 +17,7 @@ def checkout(book, borrower_id):  # check a book out from the library
         if reservation.user_id == borrower_id:
             reservation.date_end = date.today()
         else:
+            app.logger.info('FAIL : Book id={book.id} unavailable')
             return unavailable_message, 400
 
     lending = Lending(
@@ -26,11 +29,13 @@ def checkout(book, borrower_id):  # check a book out from the library
     lending_json = print_usage(lending)
     lending_json.update({'deadline': lending.deadline})
 
+    app.logger.info(f'SUCCESS : Book id={book.id} borrowed by user id={borrower_id}')
     return lending_json
 
 
 def reserve(book, user_id):
     if not book.active or get_active_lending(book) or get_active_reservation(book):
+        app.logger.info('FAIL : Book id={book.id} unavailable')
         return unavailable_message, 400
 
     reservation = Reservation(
@@ -39,6 +44,7 @@ def reserve(book, user_id):
     )
     save_to_db(reservation)
 
+    app.logger.info(f'SUCCESS : Book id={book.id} reserved by user id={user_id}')
     return print_usage(reservation)
 
 
@@ -46,19 +52,23 @@ def release(book, user_id, usage):  # release a book from a user
     if usage == 'return':
         current_use = get_active_lending(book)
         if not current_use:
+            app.logger.info('FAIL : Book id={book.id} is not checked out')
             return {'message': 'book is not checked out'}, 400
 
     elif usage == 'cancel':
         current_use = get_active_reservation(book)
         if not current_use:
+            app.logger.info('FAIL : Book id={book.id} is not reserved')
             return {'message': 'book has not been reserved'}, 400
 
     if user_id != book.owner_id and user_id != current_use.user_id:
+        app.logger.info('FAIL : Unauthorized')
         return {'message': 'unauthorized'}, 401
 
     current_use.date_end = date.today()
     save_to_db(current_use)
 
+    app.logger.info(f'SUCCESS : Book id={book.id} is availabe again')
     return print_usage(current_use)
 
 
