@@ -1,6 +1,5 @@
 from app.tests.base_test import BaseTest
 from app.models import Book, Lending, Reservation, User
-
 import app.utils as ut
 
 from datetime import date, timedelta
@@ -16,7 +15,7 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'deadline': date.today()+timedelta(weeks=4)
+                'deadline': date.today() + timedelta(weeks=4)
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book or returned unexpected information')
@@ -124,11 +123,11 @@ class UtilitiesTest(BaseTest):
             # Mark a book as returned as the book owner
             ut.save_to_db(Lending(book_id=1, user_id=2))
             expected2 = {
-                             'book': 'Test Book',
-                             'user': 'Test Borrower',
-                             'date_begin': date.today(),
-                             'date_end': date.today()
-                         }
+                'book': 'Test Book',
+                'user': 'Test Borrower',
+                'date_begin': date.today(),
+                'date_end': date.today()
+            }
             self.assertDictEqual(ut.release(book, 1, 'return'), expected2,
                                  'Unable to mark book as returned as a book owner')
 
@@ -226,8 +225,8 @@ class UtilitiesTest(BaseTest):
             reservation1 = Reservation(
                 book_id=1,
                 user_id=2,
-                date_begin=date(year=2021,month=3,day=27),
-                date_end=date(year=2021,month=4,day=7)
+                date_begin=date(year=2021, month=3, day=27),
+                date_end=date(year=2021, month=4, day=7)
             )
             ut.save_to_db(reservation1)
             self.assertIsNone(ut.get_active_reservation(book),
@@ -247,12 +246,12 @@ class UtilitiesTest(BaseTest):
         with self.app_context():
             book = Book.query.first()
             expected = {
-                        'id': 1,
-                        'title': 'Test Book',
-                        'author': 'Test Author',
-                        'year': 2021,
-                        'owner': 'Test Lender',
-                        'active': True
+                'id': 1,
+                'title': 'Test Book',
+                'author': 'Test Author',
+                'year': 2021,
+                'owner': 'Test Lender',
+                'active': True
             }
             self.assertDictEqual(ut.print_book(book), expected,
                                  'Returned unexpected information')
