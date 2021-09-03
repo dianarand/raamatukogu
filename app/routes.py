@@ -124,7 +124,7 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {user.borrower} not a valid borrower')
         return {'message': 'invalid borrower'}, 400
 
-    book = current_identity.owned_books.get(book_id)
+    book = current_identity.owned_books.filter_by(id=book_id).first()
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
         return {'message': 'book not found'}, 404
