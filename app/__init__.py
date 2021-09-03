@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_jwt import JWT
+from flask_cors import CORS
 import logging
 
 from app.db import db
@@ -18,6 +19,8 @@ def create_tables():
 db.init_app(app)
 
 jwt = JWT(app, authenticate, identity)
+
+CORS(app, resources={r"/*": {'origins': '*'}})
 
 logging.basicConfig(
     filename='app.log',
