@@ -60,7 +60,7 @@ def add_book():  # Create a new book
 @jwt_required()
 def get_book(book_id):  # Get a book
     app.logger.info(f'User {current_identity.username} getting book {book_id} information')
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
         return {'message': 'book not found'}, 404
@@ -76,7 +76,7 @@ def remove_book(book_id):  # Remove a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
@@ -114,7 +114,7 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    user = User.query.filter_by(id=borrower_id).first()
+    user = User.query.get(borrower_id)
 
     if not user:
         app.logger.info(f'FAIL : User {current_identity.username} queried user {borrower_id} not found')
@@ -124,12 +124,12 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {user.borrower} not a valid borrower')
         return {'message': 'invalid borrower'}, 400
 
-    book = current_identity.owned_books.filter_by(id=book_id).first()
-    if book:
-        return checkout(book, borrower_id)
+    book = current_identity.owned_books.get(book_id)
+    if not book:
+        app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
+        return {'message': 'book not found'}, 404
 
-    app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-    return {'message': 'book not found'}, 404
+    return checkout(book, borrower_id)
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])
@@ -140,7 +140,7 @@ def borrow_book(book_id):  # Borrow a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
@@ -153,7 +153,7 @@ def borrow_book(book_id):  # Borrow a book
 @jwt_required()
 def return_book(book_id):  # Return a book
     app.logger.info(f'User {current_identity.username} returning a book')
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
@@ -169,7 +169,7 @@ def reserve_book(book_id):  # Reserve a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
@@ -182,7 +182,7 @@ def reserve_book(book_id):  # Reserve a book
 @jwt_required()
 def cancel_reservation(book_id):  # Cancel a reservation
     app.logger.info(f'User {current_identity.username} canceling a reservation')
-    book = Book.query.filter_by(id=book_id).first()
+    book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
