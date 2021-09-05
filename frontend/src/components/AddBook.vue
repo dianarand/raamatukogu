@@ -48,11 +48,9 @@ export default {
       }
 
       const newBook = {
-        id: Math.floor(Math.random() * 100000),
         title: this.title,
         author: this.author,
         year: this.year,
-        active: true
       }
 
       this.$emit('add-book', newBook)
