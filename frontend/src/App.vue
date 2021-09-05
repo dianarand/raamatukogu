@@ -1,23 +1,22 @@
 <template>
-  <div class="container">
-    <Header @toggle-add-book="toggleAddBook" title="Raamatud" :showAddBook="showAddBook"/>
-    <p>{{ msg }}</p>
-    <router-view :showAddBook="showAddBook"></router-view>
-  </div>
+  <header>
+    <h1>Raamatute laenutus</h1>
+  </header>
+  <p>{{ msg }}</p>
+  <router-view></router-view>
 </template>
 
 <script>
-import Header from './components/Header'
+import Box from './components/Box'
 
 export default {
   name: 'App',
   components: {
-    Header
+    Box
   },
   data() {
     return {
-      msg: '',
-      showAddBook: false
+      msg: ''
     }
   },
   methods: {
@@ -38,8 +37,14 @@ export default {
 body {
   font-family: 'Poppins', sans-serif;
 }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 .container {
-  max-width: 500px;
+  max-width: 800px;
   margin: 30px auto;
   overflow: auto;
   min-height: 300px;

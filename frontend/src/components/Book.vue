@@ -2,7 +2,8 @@
   <div :class="[book.reminder ? 'reminder' : '', 'book']">
     <h3>
       {{ book.title }}
-      <i @click="$emit('delete-book', book.id)" class="fas fa-times"></i>
+      <i class="fas fa-angle-down"></i>
+      <i @click="$emit('remove-book', book.id)" class="fas fa-times"></i>
     </h3>
     <p>{{ book.author }} ({{ book.year }})</p>
   </div>

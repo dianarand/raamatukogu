@@ -12,7 +12,6 @@
       <label>Ilmumisaasta</label>
       <input type="text" v-model="year" name="year" placeholder="Lisa ilmumisaasta" />
     </div>
-
     <input type="submit" value="Salvesta raamat" class="btn btn-block" />
   </form>
 </template>
@@ -22,7 +21,6 @@ export default {
   name: 'AddBook',
   data() {
     return {
-      reminder: false,
       title: '',
       author: '',
       year: ''

@@ -1,12 +1,13 @@
 <template>
   <div :key="book.id" v-for="book in books">
-    <Book @delete-book="$emit('delete-book', book.id)"
+    <Book @remove-book="$emit('remove-book', book.id)"
           :book="book" />
   </div>
 </template>
 
 <script>
 import Book from './Book'
+import axios from "axios";
 
 export default {
   name: 'Books',
