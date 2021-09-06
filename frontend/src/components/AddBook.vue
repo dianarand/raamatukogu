@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'AddBook',
   data() {
@@ -27,6 +29,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['addBook']),
     onSubmit(e) {
       e.preventDefault()
 
@@ -51,7 +54,7 @@ export default {
         year: this.year,
       }
 
-      this.$emit('add-book', newBook)
+      this.addBook(newBook)
 
       this.title = ''
       this.author = ''

@@ -1,7 +1,6 @@
 <template>
-  <div :key="book.id" v-for="book in books">
-    <Book @remove-book="$emit('remove-book', book.id)"
-          :book="book" />
+  <div :key="book.id" v-for="book in $store.state.books">
+    <Book :book="book" />
   </div>
 </template>
 
@@ -10,12 +9,11 @@ import Book from './Book'
 
 export default {
   name: 'Books',
-  props: {
-    books: Array
-  },
   components: {
     Book
   },
-  emits: ['remove-book'],
+  created() {
+    this.$store.dispatch('fetchBooks');
+  }
 }
 </script>
