@@ -7,8 +7,8 @@
         :text="showAddBook ? 'Sulge' : 'Lisa raamat'"
         :color="showAddBook ? 'red' : 'green'"/>
     </div>
-    <p>{{ msg }}</p>
-    <AddBook v-show="showAddBook" />
+    <p>{{ $store.state.msg }}</p>
+    <AddBook v-show="showAddBook" @hideAddBook="$emit('toggle-add-book')"/>
     <Books />
   </div>
 </template>

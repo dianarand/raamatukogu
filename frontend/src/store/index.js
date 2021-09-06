@@ -3,32 +3,8 @@ import axios from 'axios'
 
 export default createStore({
   state: {
-    books: [
-      {
-        id: 1,
-        title: "Harry Potter and the Philosopher's Stone",
-        author: "J. K. Rowling",
-        year: "1997",
-        active: true,
-        reminder: true,
-      },
-      {
-        id: 2,
-        title: "Hunger Games",
-        author: "Suzanne Collins",
-        year: "2008",
-        active: true,
-        reminder: true,
-      },
-      {
-        id: 3,
-        title: "A Court of Thorns and Roses",
-        author: "Sarah J. Maas",
-        year: "2015",
-        active: true,
-        reminder: false,
-      }
-    ]
+    books: [],
+    msg: '',
   },
   mutations: {
     saveBooks(state, books) {
@@ -39,6 +15,12 @@ export default createStore({
     },
     removeBook(state, id) {
       state.books = state.books.filter((book) => book.id != id)
+    },
+    setMessage(state, msg) {
+      state.msg = msg
+    },
+    clearMessage(state) {
+      state.msg = ''
     }
   },
   actions: {
@@ -62,7 +44,7 @@ export default createStore({
       const path = 'http://localhost:5000/books'
       axios.post(path, payload)
       .then ((res) => {
-        // this.msg = res.data.message;
+        commit('setMessage', res.data.message)
         if (res.status === 201) {
           commit('addBook', book)
         }
@@ -79,7 +61,7 @@ export default createStore({
           if (res.status === 200) {
             commit('removeBook', id)
           }
-          // this.msg = res.data.message;
+          commit('setMessage', res.data.message)
         })
         .catch((err) => {
           console.error(err);

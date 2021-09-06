@@ -59,6 +59,8 @@ export default {
       this.title = ''
       this.author = ''
       this.year = ''
+
+      this.$emit('hideAddBook')
     }
   }
 }
