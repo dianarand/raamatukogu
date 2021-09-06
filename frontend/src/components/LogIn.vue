@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { mapActions } from 'vuex'
 
 export default {
   name: 'LogIn',
@@ -25,6 +25,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['logIn']),
     onSubmit(e) {
       e.preventDefault()
 
@@ -38,26 +39,17 @@ export default {
         return
       }
 
-      const payload = {
+      const user = {
         username: this.username,
         password: this.password
       }
 
-      const path = 'http://localhost:5000/login'
-
-      axios.post(path, payload)
-      .then ((res) => {
-        if (res.status === 200) {
-          this.access_token = 'JWT ' + res.data['access_token']
-          this.$emit('user-login', this.access_token)
-        }
-      })
-      .catch ((err) => {
-        console.error(err);
-      });
+      this.logIn(user)
 
       this.username = ''
       this.password = ''
+
+      this.$router.push('/')
     }
   }
 }

@@ -4,6 +4,8 @@ import axios from 'axios'
 export default createStore({
   state: {
     books: [],
+    access_token: undefined,
+    role: undefined,
     msg: '',
   },
   mutations: {
@@ -21,11 +23,19 @@ export default createStore({
     },
     clearMessage(state) {
       state.msg = ''
+    },
+    setToken(state, token) {
+      state.access_token = token
+      console.log(state.access_token)
+    },
+    setRole(state, role) {
+      state.role = role
+      console.log(state.role)
     }
   },
   actions: {
     fetchBooks({ commit }) {
-      // const path = `http://localhost:5000/books?filter=${self.bookFilter}`;
+      // const path = `http://localhost:5000/books?filter=${bookFilter}`;
       const path = 'http://localhost:5000/books';
       axios.get(path)
       .then ((res) => {
@@ -67,6 +77,31 @@ export default createStore({
           console.error(err);
         });
       }
+    },
+    logIn({ commit }, user) {
+      const path = 'http://localhost:5000/login'
+      axios.post(path, user)
+      .then ((res) => {
+        if (res.status === 200) {
+          const access_token = 'JWT ' + res.data.access_token
+          commit('setToken', access_token)
+          const path2 = 'http://localhost:5000/role'
+          axios.get(path2, {
+            headers: {
+              'Authorization': access_token
+            }
+          })
+          .then ((res2) => {
+            commit('setRole', res2.data.role)
+          })
+          .catch ((err) => {
+            console.error(err);
+          });
+        }
+      })
+      .catch ((err) => {
+        console.error(err);
+      });
     }
   },
   modules: {
