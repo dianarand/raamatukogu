@@ -2,12 +2,12 @@
   <header>
     <h1>Raamatute laenutus</h1>
   </header>
-  <p>{{ msg }}</p>
-  <router-view></router-view>
+  <router-view @user-login=addToken></router-view>
 </template>
 
 <script>
 import Box from './components/Box'
+import axios from "axios";
 
 export default {
   name: 'App',
@@ -16,13 +16,42 @@ export default {
   },
   data() {
     return {
-      msg: ''
+      access_token: undefined,
+      role: undefined
     }
   },
   methods: {
     toggleAddBook() {
       this.showAddBook = !this.showAddBook
     },
+    checkCredentials() {
+      if (self.access_token === undefined) {
+        this.$router.push('/login')
+      }
+      else {
+        const path = 'http://localhost:5000/role';
+        axios.get(path, {
+          headers: {
+            'Authorization': self.access_token
+          }
+        })
+        .then ((res) => {
+          this.role = res.data.role;
+        })
+        .catch ((err) => {
+          console.error(err);
+        });
+        console.log(this.role)
+        console.log(this.access_token)
+      }
+    },
+    addToken(token) {
+      this.access_token = token
+      this.checkCredentials()
+    }
+  },
+  created() {
+    this.checkCredentials()
   }
 }
 </script>

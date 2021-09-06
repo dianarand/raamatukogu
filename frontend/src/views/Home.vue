@@ -26,7 +26,6 @@ export default {
   name: 'Home',
   data() {
     return {
-      msg: '',
       showAddBook: false
     }
   },

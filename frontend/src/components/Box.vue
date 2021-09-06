@@ -7,6 +7,7 @@
         :text="showAddBook ? 'Sulge' : 'Lisa raamat'"
         :color="showAddBook ? 'red' : 'green'"/>
     </div>
+    <p>{{ msg }}</p>
     <AddBook v-show="showAddBook" @add-book="addBook"/>
     <Books @remove-book="deleteBook" :books="books"/>
   </div>
@@ -32,7 +33,8 @@ export default {
   },
   data() {
     return {
-      books: []
+      books: [],
+      msg: ''
     }
   },
   computed: {
@@ -50,7 +52,7 @@ export default {
       const path = 'http://localhost:5000/books'
       axios.post(path, payload)
       .then ((res) => {
-        this.msg = res.data['message']
+        this.msg = res.data.message;
       })
       .catch ((err) => {
         console.error(err);
@@ -66,7 +68,7 @@ export default {
               if (res.status === 200) {
                 this.books = this.books.filter((book) => book.id != id)
               }
-              this.msg = res.data['message']
+              this.msg = res.data.message;
             })
             .catch((err) => {
               console.error(err);
@@ -78,7 +80,7 @@ export default {
       const path = 'http://localhost:5000/books';
       axios.get(path)
       .then ((res) => {
-        this.books = res.data['books'];
+        this.books = res.data.books;
       })
       .catch ((err) => {
         console.error(err);

@@ -7,7 +7,6 @@
 
 <script>
 import Book from './Book'
-import axios from "axios";
 
 export default {
   name: 'Books',
@@ -17,6 +16,6 @@ export default {
   components: {
     Book
   },
-  emits: ['delete-book'],
+  emits: ['remove-book'],
 }
 </script>

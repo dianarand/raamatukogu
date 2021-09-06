@@ -48,7 +48,8 @@ export default {
       axios.post(path, payload)
       .then ((res) => {
         if (res.status === 200) {
-          this.access_token = res.data['access_token']
+          this.access_token = 'JWT ' + res.data['access_token']
+          this.$emit('user-login', this.access_token)
         }
       })
       .catch ((err) => {
