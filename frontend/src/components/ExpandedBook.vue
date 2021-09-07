@@ -1,14 +1,12 @@
 <template>
   <div>
+    <p>...</p>
     <div v-show="bookIsOut">
-      <p>Raamat on valja laenutatud.</p>
-      <p>Laenutaja: {{ book.lending }}</p>
-      <p>Tahtaeg: {{ book.deadline }}</p>
+      <p>Laenutuse tahtaeg: {{ book.deadline }}</p>
       <a href="javascript:void(0)" @click="returnBook(book.id)">Margi tagastatuks</a>
     </div>
     <div v-show="bookIsReserved">
       <p>Raamat on broneeritud.</p>
-      <p>Broneerija: {{ book.reservation }}</p>
       <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tyhista broneering</a>
     </div>
   </div>

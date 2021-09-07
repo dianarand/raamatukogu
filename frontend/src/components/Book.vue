@@ -1,11 +1,13 @@
 <template>
-  <div class="book">
+  <div @dblclick="toggleExpanded()" class="book">
     <h3>
       {{ book.title }}
       <div role="group">
         <i class="fas fa-undo-alt"></i>
         <i @click="toggleExpanded()" class="fas fa-chevron-down"></i>
-        <i @click="removeBook(book.id)" class="fas fa-times"></i>
+        <i @click="removeBook(book.id)"
+           v-if="hasRemoveBook"
+            class="fas fa-times"></i>
       </div>
     </h3>
     <p>{{ book.author }} ({{ book.year }})</p>
@@ -28,7 +30,8 @@ export default {
     }
   },
   props: {
-    book: Object
+    book: Object,
+    hasRemoveBook: Boolean
   },
   methods: {
     async removeBook(id) {
@@ -41,7 +44,6 @@ export default {
       }
     },
     toggleExpanded() {
-      console.log('click')
       this.showExpanded = !this.showExpanded
     }
   }

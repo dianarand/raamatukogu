@@ -13,7 +13,7 @@
     </div>
     <input type="submit" value="Otsi" class="btn btn-block" />
   </form>
-  <Results :books="result"/>
+  <Results v-if="showResults" :books="result"/>
 </template>
 
 <script>

@@ -17,6 +17,7 @@
     <div :key="book.id" v-for="book in books">
       <Book
           :book="book"
+          :hasRemoveBook="showForLender"
           @setMessage="setMessage"
           @removeBook="removeBook"
       />
@@ -28,6 +29,7 @@
 import Button from "./Button";
 import AddBook from "./AddBook";
 import Book from "./Book";
+import {showForLender} from "../utils";
 import axios from "axios";
 
 export default {
@@ -42,6 +44,9 @@ export default {
     Button,
     AddBook,
     Book
+  },
+  computed: {
+    showForLender
   },
   data() {
     return {

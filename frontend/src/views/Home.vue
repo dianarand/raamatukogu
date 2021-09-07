@@ -19,7 +19,7 @@
   />
   <Books
       @toggle-add-book="toggleAddBook"
-      title="Minu reserveeringud"
+      title="Minu broneeringud"
       :hasAddBook="false"
       :showAddBook="showAddBook"
       bookFilter="reserved_by_me"
@@ -30,6 +30,7 @@
 <script>
 import Search from '../components/Search'
 import Books from '../components/Books'
+import {showForBorrower, showForLender} from "../utils";
 
 export default {
   name: 'Home',
@@ -43,20 +44,8 @@ export default {
     Books
   },
   computed: {
-    showForLender() {
-      if (localStorage.getItem('role') === 'lender') {
-        return true
-      } else {
-        return false
-      }
-    },
-    showForBorrower() {
-      if (localStorage.getItem('role') === 'borrower') {
-        return true
-      } else {
-        return false
-      }
-    }
+    showForBorrower,
+    showForLender
   },
   methods: {
     toggleAddBook() {
@@ -64,7 +53,6 @@ export default {
     },
     logOut() {
       localStorage.removeItem('token');
-      console.log(localStorage.getItem('token'))
       this.$router.push('/login')
     },
   }
