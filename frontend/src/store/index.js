@@ -14,9 +14,8 @@ export default createStore({
     clearMessage: (state) => (state.msg = ''),
   },
   actions: {
-    async fetchBooks({ commit }) {
-      // const path = `http://localhost:5000/books?filter=${bookFilter}`;
-      const res = await axios.get('books')
+    async fetchBooks({ commit }, bookFilter) {
+      const res = await axios.get(`books?filter=${bookFilter}`)
       console.log(res.data)
       commit('saveBooks', res.data.books)
     },

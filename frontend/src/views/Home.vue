@@ -2,23 +2,26 @@
   <Box
       @toggle-add-book="toggleAddBook"
       title="Minu raamatud"
+      :hasAddBook="true"
       :showAddBook="showAddBook"
       bookFilter="owned_by_me"
-      v-show="showForLender"
+      v-if="showForLender"
   />
   <Box
       @toggle-add-book="toggleAddBook"
       title="Minu laenutused"
+      :hasAddBook="false"
       :showAddBook="showAddBook"
       bookFilter="borrowed_by_me"
-      v-show="showForBorrower"
+      v-if="showForBorrower"
   />
   <Box
       @toggle-add-book="toggleAddBook"
       title="Minu reserveeringud"
+      :hasAddBook="false"
       :showAddBook="showAddBook"
       bookFilter="reserved_by_me"
-      v-show="showForBorrower"
+      v-if="showForBorrower"
   />
 </template>
 
