@@ -118,7 +118,11 @@ class RoutesTest(BaseTest):
                     'author': 'Test Author',
                     'year': 2021,
                     'owner': 'Test Lender',
-                    'active': True
+                    'active': True,
+                    'lending': None,
+                    'deadline': None,
+                    'overtime': False,
+                    'reservation': None
                 }
                 self.assertEqual(response.status_code, 200)
                 self.assertDictEqual(json.loads(response.data), expected)
@@ -304,8 +308,7 @@ class RoutesTest(BaseTest):
                                             'Content-Type': 'application/json'})
                 result = json.loads(response3.data)
                 self.assertEqual(response3.status_code, 200)
-                self.assertEqual(result['book'], 'Test Book')
-                self.assertEqual(result['user'], 'borrower')
+                self.assertEqual(result, {'message': 'book is now available'})
                 self.assertIsNotNone(result['date_end'])
 
     def test_reserve_book(self):
@@ -365,6 +368,5 @@ class RoutesTest(BaseTest):
                                             'Content-Type': 'application/json'})
                 result = json.loads(response2.data)
                 self.assertEqual(response2.status_code, 200)
-                self.assertEqual(result['book'], 'Test Book')
-                self.assertEqual(result['user'], 'borrower')
+                self.assertEqual(result, {'message': 'book is now available'})
                 self.assertIsNotNone(result['date_end'])

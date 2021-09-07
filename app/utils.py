@@ -69,7 +69,7 @@ def release(book, user_id, usage):  # release a book from a user
     save_to_db(current_use)
 
     app.logger.info(f'SUCCESS : Book {book.title} is made available')
-    return print_usage(current_use)
+    return {'message': 'book is now available'}
 
 
 def get_active_lending(book):
@@ -81,31 +81,35 @@ def get_active_reservation(book):
 
 
 def print_book(book):  # return book information to JSON
-    return {
+    data = {
         'id': book.id,
         'title': book.title,
         'author': book.author,
         'year': book.year,
         'owner': book.owner.username,
-        'active': book.active
+        'active': book.active,
+        'lending': None,
+        'deadline': None,
+        'overtime': False,
+        'reservation': None
     }
+    lending = get_active_lending(book)
+    if lending:
+        data.update({'lending': lending.user.username,
+                     'deadline': lending.deadline})
+        if lending.deadline < date.today():
+            data.update({'overtime': True})
+    else:
+        reservation = get_active_reservation(book)
+        if reservation:
+            data.update({'reservation': reservation.user.username})
+    return data
 
 
-def print_book_list(books, check_overtime=False):
+def print_book_list(books):
     book_list = []
     for book in books:
-        book_data = print_book(book)
-
-        if check_overtime:
-            overtime = False
-            lending = get_active_lending(book)
-            if lending:
-                if lending.deadline < date.today():
-                    overtime = True
-            book_data.update({'overtime': overtime})
-
-        book_list.append(book_data)
-
+        book_list.append(print_book(book))
     return {'books': book_list}
 
 

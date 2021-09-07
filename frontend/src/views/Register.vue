@@ -21,6 +21,8 @@
       </div>
       <input type="submit" value="Registreeru" class="btn btn-block" />
     </form>
+    <p>Kasutaja olemas?</p>
+    <h3><router-link to="/login">Logi sisse</router-link></h3>
   </div>
 </template>
 

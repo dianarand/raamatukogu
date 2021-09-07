@@ -4,19 +4,19 @@ import axios from 'axios'
 export default createStore({
   state: {
     books: [],
-    msg: '',
+    user: null,
+    msg: null,
   },
   mutations: {
     saveBooks: (state, books) => (state.books = books),
     addBook: (state, book) => (state.books = [...state.books, book]),
     removeBook: (state, id) => (state.books = state.books.filter((book) => book.id != id)),
     setMessage: (state, msg) => (state.msg = msg),
-    clearMessage: (state) => (state.msg = ''),
+    clearMessage: (state) => (state.msg = null),
   },
   actions: {
     async fetchBooks({ commit }, bookFilter) {
       const res = await axios.get(`books?filter=${bookFilter}`)
-      console.log(res.data)
       commit('saveBooks', res.data.books)
     },
     async addBook({ commit }, book) {

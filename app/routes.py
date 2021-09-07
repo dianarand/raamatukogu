@@ -25,7 +25,7 @@ def get_book_list():  # Get a list of books
     if 'filter' in keys:
         result = by_filter(result, query['filter'], current_identity.id)
     app.logger.info(f'SUCCESS : List of books returned to user {current_identity.username}')
-    return print_book_list(result.all(), True)
+    return print_book_list(result.all())
 
 
 @app.route('/books', methods=['POST'])
@@ -104,7 +104,7 @@ def lend_book(book_id):  # Lend a book
     data = request.get_json()
     try:
         borrower_id = data['borrower_id']
-    except KeyError:
+    except (KeyError, TypeError):
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
         return {'message': 'invalid data'}, 400
 
