@@ -1,5 +1,5 @@
 <template>
-  <form @submit="onSubmit" class="add-form">
+  <form @submit.prevent="onSubmit" class="add-form">
     <div class="form-control">
       <label>Pealkiri</label>
       <input type="text" v-model="title" name="title" placeholder="Lisa raamat" />
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import axios from "axios";
 
 export default {
   name: 'AddBook',
@@ -29,10 +29,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addBook']),
-    onSubmit(e) {
-      e.preventDefault()
-
+    async onSubmit() {
       if(!this.title) {
         alert('Palun lisa pealkiri')
         return
@@ -48,20 +45,26 @@ export default {
         return
       }
 
-      const newBook = {
+      const book = {
         title: this.title,
         author: this.author,
-        year: this.year,
+        year: this.year
       }
 
-      this.addBook(newBook)
+      const res = await axios.post('books', book)
+
+      this.$emit('setMessage', res.data.message)
+
+      if (res.status === 201) {
+        this.$emit('addBook', book)
+      }
 
       this.title = ''
       this.author = ''
       this.year = ''
 
       this.$emit('hideAddBook')
-    }
+    },
   }
 }
 </script>

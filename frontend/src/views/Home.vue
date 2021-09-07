@@ -1,6 +1,7 @@
 <template>
   <a href="javascript:void(0)" @click="logOut">Logi välja</a>
-  <Box
+  <Search v-if="showForBorrower"/>
+  <Books
       @toggle-add-book="toggleAddBook"
       title="Minu raamatud"
       :hasAddBook="true"
@@ -8,7 +9,7 @@
       bookFilter="owned_by_me"
       v-if="showForLender"
   />
-  <Box
+  <Books
       @toggle-add-book="toggleAddBook"
       title="Minu laenutused"
       :hasAddBook="false"
@@ -16,7 +17,7 @@
       bookFilter="borrowed_by_me"
       v-if="showForBorrower"
   />
-  <Box
+  <Books
       @toggle-add-book="toggleAddBook"
       title="Minu reserveeringud"
       :hasAddBook="false"
@@ -27,7 +28,8 @@
 </template>
 
 <script>
-import Box from '../components/Box'
+import Search from '../components/Search'
+import Books from '../components/Books'
 
 export default {
   name: 'Home',
@@ -37,7 +39,8 @@ export default {
     }
   },
   components: {
-    Box
+    Search,
+    Books
   },
   computed: {
     showForLender() {

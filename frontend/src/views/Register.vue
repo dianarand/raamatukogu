@@ -55,7 +55,6 @@ export default {
         password: this.password,
         role: this.role
       })
-      console.log(res.data.message)
 
       this.username = ''
       this.password = ''

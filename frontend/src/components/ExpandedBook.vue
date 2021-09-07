@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div>
-      <p> Omanik: {{ book.owner }}</p>
-    </div>
     <div v-show="bookIsOut">
       <p>Raamat on valja laenutatud.</p>
       <p>Laenutaja: {{ book.lending }}</p>
@@ -28,14 +25,18 @@ export default {
   },
   computed: {
     bookIsOut() {
-      if (this.book.lending !== null) {
+      if (this.book.lending === undefined) {
+        return false
+      } else if (this.book.lending !== null) {
         return true
       } else {
         return false
       }
     },
     bookIsReserved() {
-      if (this.book.reservation !== null) {
+      if (this.book.reservation === undefined) {
+        return false
+      } else if (this.book.reservation !== null) {
         return true
       } else {
         return false

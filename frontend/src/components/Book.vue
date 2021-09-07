@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import ExpandedBook from './ExpandedBook'
+import axios from "axios";
 
 export default {
   name: 'Book',
@@ -31,8 +31,17 @@ export default {
     book: Object
   },
   methods: {
-    ...mapActions(['removeBook']),
+    async removeBook(id) {
+      if(confirm('Kas olete kindel, et soovite eemaldada raamatu laenamise nimekirjast?')) {
+        const res = await axios.delete(`http://localhost:5000/book/${id}`)
+        if (res.status === 200) {
+          this.$emit('removeBook', id)
+        }
+        this.$emit('setMessage', res.data.message)
+      }
+    },
     toggleExpanded() {
+      console.log('click')
       this.showExpanded = !this.showExpanded
     }
   }
