@@ -1,4 +1,5 @@
 <template>
+  <a href="javascript:void(0)" @click="logOut">Logi välja</a>
   <Box
       @toggle-add-book="toggleAddBook"
       title="Minu raamatud"
@@ -57,6 +58,11 @@ export default {
   methods: {
     toggleAddBook() {
       this.showAddBook = !this.showAddBook
+    },
+    logOut() {
+      localStorage.removeItem('token');
+      console.log(localStorage.getItem('token'))
+      this.$router.push('/login')
     },
   }
 }

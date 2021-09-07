@@ -10,7 +10,14 @@
       </div>
       <div class="form-control">
         <label>Parool</label>
-        <input type="text" v-model="password" name="password" placeholder="Parool" />
+        <input type="password" v-model="password" name="password" placeholder="Parool" />
+      </div>
+      <div class="form-control">
+        <label>Soovin</label>
+        <input type="radio" id="lender" name="role" value="lender" v-model="role">
+        <label for="lender">Laenutada välja oma raamatuid</label>
+        <input type="radio" id="borrower" name="role" value="borrower" v-model="role">
+        <label for="borrower">Laenata raamatuid</label>
       </div>
       <input type="submit" value="Registreeru" class="btn btn-block" />
     </form>
@@ -26,7 +33,7 @@ export default {
     return {
       username: '',
       password: '',
-      role: 'borrower',
+      role: '',
     }
   },
   methods: {

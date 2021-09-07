@@ -10,10 +10,12 @@
       </div>
       <div class="form-control">
         <label>Parool</label>
-        <input type="text" v-model="password" name="password" placeholder="Parool" />
+        <input type="password" v-model="password" name="password" placeholder="Parool" />
       </div>
       <input type="submit" value="Logi sisse" class="btn btn-block" />
     </form>
+    <p>Pole veel kasutajat?</p>
+    <h3><router-link to="/register">Registreeru</router-link></h3>
   </div>
 </template>
 

@@ -2,6 +2,7 @@
   <header>
     <h1>Raamatute laenutus</h1>
   </header>
+
   <router-view></router-view>
 </template>
 
@@ -17,14 +18,14 @@ export default {
     toggleAddBook() {
       this.showAddBook = !this.showAddBook
     },
-    // checkCredentials() {
-    //   if (this.$store.state.access_token === undefined) {
-    //     this.$router.push('/login')
-    //   }
-    // }
+    checkCredentials() {
+      if (localStorage.getItem('token') === null) {
+        this.$router.push('/login')
+      }
+    }
   },
   created() {
-    // this.checkCredentials()
+    this.checkCredentials()
   }
 }
 </script>
