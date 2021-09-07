@@ -17,14 +17,14 @@ export default {
     toggleAddBook() {
       this.showAddBook = !this.showAddBook
     },
-    checkCredentials() {
-      if (this.$store.state.access_token === undefined) {
-        this.$router.push('/login')
-      }
-    }
+    // checkCredentials() {
+    //   if (this.$store.state.access_token === undefined) {
+    //     this.$router.push('/login')
+    //   }
+    // }
   },
   created() {
-    this.checkCredentials()
+    // this.checkCredentials()
   }
 }
 </script>

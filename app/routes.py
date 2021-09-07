@@ -15,7 +15,7 @@ def get_book_list():  # Get a list of books
     app.logger.info(f'User {current_identity.username} getting a list of books')
     query = request.args
     keys = query.keys()
-    result = None
+    result = Book.query.filter_by(active=True)
     if 'title' in keys:
         result = by_title(result, query['title'])
     if 'author' in keys:
@@ -24,8 +24,6 @@ def get_book_list():  # Get a list of books
         result = by_year(result, query['year'])
     if 'filter' in keys:
         result = by_filter(result, query['filter'], current_identity.id)
-    if not result:
-        result = Book.query
     app.logger.info(f'SUCCESS : List of books returned to user {current_identity.username}')
     return print_book_list(result.all(), True)
 

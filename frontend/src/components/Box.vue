@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="header">
-      <h1>{{ title }}</h1>
+      <h2>{{ title }}</h2>
       <Button v-show="homePage"
         @btn-click="$emit('toggle-add-book')"
         :text="showAddBook ? 'Sulge' : 'Lisa raamat'"

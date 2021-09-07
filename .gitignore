@@ -1,7 +1,9 @@
+app.log
 /.idea/
 /venv/
 /app/static/
 /app/templates/
 /app/__pycache__/
 /app/data.db
-app.log
+/frontend/node_modules/
+/frontend/dist/

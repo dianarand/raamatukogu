@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="header">
-      <h2>Logi sisse</h2>
+      <h2>Registreeru</h2>
     </div>
     <form @submit.prevent="onSubmit" class="add-form">
       <div class="form-control">
@@ -12,7 +12,7 @@
         <label>Parool</label>
         <input type="text" v-model="password" name="password" placeholder="Parool" />
       </div>
-      <input type="submit" value="Logi sisse" class="btn btn-block" />
+      <input type="submit" value="Registreeru" class="btn btn-block" />
     </form>
   </div>
 </template>
@@ -21,46 +21,42 @@
 import axios from "axios";
 
 export default {
-  name: 'Login',
+  name: 'LogIn',
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      role: 'borrower',
     }
   },
   methods: {
     async onSubmit() {
-
-      if (!this.username) {
+      if(!this.username) {
         alert('Sisesta kasutajanimi')
         return
       }
 
-      if (!this.password) {
+      if(!this.password) {
         alert('Sisesta parool')
         return
       }
 
-      const res = await axios.post('http://localhost:5000/login', {
+      const res = await axios.post('register', {
         username: this.username,
-        password: this.password
+        password: this.password,
+        role: this.role
       })
-
-      if (res.status === 200) {
-        localStorage.setItem('token', res.data.access_token)
-        localStorage.setItem('role', res.data.role)
-      }
+      console.log(res.data.message)
 
       this.username = ''
       this.password = ''
 
-      console.log(localStorage.getItem('token'))
-
-      this.$router.push('/')
+      this.$router.push('/login')
     }
   }
 }
 </script>
+
 <style scoped>
 .add-form {
   margin-bottom: 40px;

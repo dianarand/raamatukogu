@@ -37,14 +37,14 @@ export default {
   },
   computed: {
     showForLender() {
-      if (this.$store.state.role === 'lender') {
+      if (localStorage.getItem('role') === 'lender') {
         return true
       } else {
         return false
       }
     },
     showForBorrower() {
-      if (this.$store.state.role === 'borrower') {
+      if (localStorage.getItem('role') === 'borrower') {
         return true
       } else {
         return false
