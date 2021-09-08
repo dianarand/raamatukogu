@@ -14,7 +14,7 @@
         @addBook="addBook"
         @hideAddBook="$emit('toggle-add-book')"
     />
-    <div :key="book.id" v-for="book in books">
+    <ul class="list-group" :key="book.id" v-for="book in books">
       <Book
           :book="book"
           :hasRemoveBook="showForLender"
@@ -22,7 +22,7 @@
           @setMessage="setMessage"
           @removeBook="removeBook"
       />
-    </div>
+    </ul>
   </div>
 </template>
 
@@ -64,7 +64,7 @@ export default {
         const res = await axios.get(`books?filter=${this.bookFilter}`)
         this.books = res.data.books
       } catch(err) {
-        this.$router.push('/login')
+        // this.$router.push('/login')
       }
     },
     addBook(book) {
@@ -80,3 +80,10 @@ export default {
   emits: ['toggle-add-book'],
 }
 </script>
+<style scoped>
+.list-group {
+  width: auto;
+  max-width: 460px;
+  margin: auto;
+}
+</style>

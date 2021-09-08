@@ -1,23 +1,53 @@
+
 <template>
-  <div @dblclick="toggleExpanded()" class="book">
-    <h3>
-      {{ book.title }}
-      <div role="group">
-        <i @click="toggleExpanded()"
-           class="fas fa-chevron-down"></i>
-        <i @click="removeBook(book.id)"
-           v-if="ableToRemove"
-            class="fas fa-times"></i>
+  <li class="list-group-item list-group-item-action d-flex gap-3 py-3">
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <i class="fas fa-book fa-3x"></i>
+      <div>
+        <h5 class="mb-1">{{ book.title }}</h5>
+        <p class="mb-1">{{ book.author }}</p>
+        <div>
+          <ExpandedBook
+          v-show="showExpanded"
+          :book="book"
+          :showAdditional="showAdditional"
+          />
+        </div>
       </div>
-    </h3>
-    <p>{{ book.author }} ({{ book.year }})</p>
+      <div>
+        <div role="group">
+          <i @click="toggleExpanded()"
+             class="fas fa-info-circle"></i>
+          <i @click="removeBook(book.id)"
+             v-if="ableToRemove"
+              class="fas fa-times"></i>
+        </div>
+        <small class="text-nowrap">{{ book.year }}</small>
+      </div>
+    </div>
+  </li>
+</template>
+
+<!--<template>-->
+<!--  <div @dblclick="toggleExpanded()" class="book">-->
+<!--    <h3>-->
+<!--      {{ book.title }}-->
+<!--      <div role="group">-->
+<!--        <i @click="toggleExpanded()"-->
+<!--           class="fas fa-chevron-down"></i>-->
+<!--        <i @click="removeBook(book.id)"-->
+<!--           v-if="ableToRemove"-->
+<!--            class="fas fa-times"></i>-->
+<!--      </div>-->
+<!--    </h3>-->
+<!--    <p>{{ book.author }} ({{ book.year }})</p>-->
     <ExpandedBook
         v-show="showExpanded"
         :book="book"
         :showAdditional="showAdditional"
     />
-  </div>
-</template>
+<!--  </div>-->
+<!--</template>-->
 
 <script>
 import ExpandedBook from './ExpandedBook'
@@ -65,16 +95,9 @@ export default {
 }
 </script>
 
-<style scope>
-.book {
-  background: #f4f4f4;
+<style scoped>
+i {
   margin: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
 }
-.book h3 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+
 </style>
