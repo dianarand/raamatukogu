@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_jwt import JWT
+from flask_cors import CORS
 import logging
 
 from app.db import db
@@ -18,6 +19,19 @@ def create_tables():
 db.init_app(app)
 
 jwt = JWT(app, authenticate, identity)
+
+
+@jwt.auth_response_handler
+def login_handler(access_token, identity):
+    role = None
+    if identity.lender:
+        role = 'lender'
+    if identity.borrower:
+        role = 'borrower'
+    return {'access_token': access_token.decode('utf-8'), 'role': role}
+
+
+CORS(app, resources={r"/*": {'origins': '*'}})
 
 logging.basicConfig(
     filename='app.log',

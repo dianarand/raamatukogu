@@ -16,39 +16,40 @@ class SearchTest(BaseTest):
             db.session.add(Lending(book_id=1, user_id=2))
             db.session.add(Reservation(book_id=2, user_id=2))
             db.session.commit()
+            self.result = Book.query
 
     def test_by_title(self):
         with self.app_context():
-            result = se.by_title(None, 'Test Book').all()
-            expected = Book.query.filter_by(title='Test Book').all()
+            result = se.by_title(self.result, 'Test Book').all()
+            expected = self.result.filter_by(title='Test Book').all()
             self.assertEqual(result, expected, 'Returned unexpected result')
 
     def test_by_author(self):
         with self.app_context():
-            result = se.by_author(None, 'Test Author').all()
-            expected = Book.query.filter_by(author='Test Author').all()
+            result = se.by_author(self.result, 'Test Author').all()
+            expected = self.result.filter_by(author='Test Author').all()
             self.assertEqual(result, expected, 'Returned unexpected result')
 
     def test_by_year(self):
         with self.app_context():
-            result = se.by_year(None, 2020).all()
-            expected = Book.query.filter_by(year=2020).all()
+            result = se.by_year(self.result, 2020).all()
+            expected = self.result.filter_by(year=2020).all()
             self.assertEqual(result, expected, 'Returned unexpected result')
 
     def test_books_owned_by_me(self):
         with self.app_context():
-            result = se.by_filter(None, 'owned_by_me', 1).all()
-            expected = Book.query.filter_by(owner_id=1).all()
+            result = se.by_filter(self.result, 'owned_by_me', 1).all()
+            expected = self.result.filter_by(owner_id=1).all()
             self.assertEqual(result, expected, 'Returned unexpected result')
 
     def test_books_borrowed_by_me(self):
         with self.app_context():
-            result = se.by_filter(None, 'borrowed_by_me', 2).all()
-            expected = Book.query.filter_by(id=1).all()
+            result = se.by_filter(self.result, 'borrowed_by_me', 2).all()
+            expected = self.result.filter_by(id=1).all()
             self.assertEqual(result, expected, 'Returned unexpected result')
 
     def test_books_reserved_by_me(self):
         with self.app_context():
-            result = se.by_filter(None, 'reserved_by_me', 2).all()
-            expected = Book.query.filter_by(id=2).all()
+            result = se.by_filter(self.result, 'reserved_by_me', 2).all()
+            expected = self.result.filter_by(id=2).all()
             self.assertEqual(result, expected, 'Returned unexpected result')

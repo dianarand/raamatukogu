@@ -6,7 +6,7 @@ from app import app
 
 from app.models import Book, User
 from app.search import by_title, by_author, by_year, by_filter
-from app.utils import checkout, reserve, release, print_book, print_book_list, save_to_db
+from app.utils import checkout, reserve, release, get_active_lending, print_books, save_to_db
 
 
 @app.route('/books', methods=['GET'])
@@ -15,7 +15,7 @@ def get_book_list():  # Get a list of books
     app.logger.info(f'User {current_identity.username} getting a list of books')
     query = request.args
     keys = query.keys()
-    result = None
+    result = Book.query.filter_by(active=True)
     if 'title' in keys:
         result = by_title(result, query['title'])
     if 'author' in keys:
@@ -24,10 +24,8 @@ def get_book_list():  # Get a list of books
         result = by_year(result, query['year'])
     if 'filter' in keys:
         result = by_filter(result, query['filter'], current_identity.id)
-    if not result:
-        result = Book.query
     app.logger.info(f'SUCCESS : List of books returned to user {current_identity.username}')
-    return print_book_list(result.all(), True)
+    return print_books(result.all())
 
 
 @app.route('/books', methods=['POST'])
@@ -56,16 +54,16 @@ def add_book():  # Create a new book
     return {'message': 'book added successfully'}, 201
 
 
-@app.route('/book/<int:book_id>', methods=['GET'])
-@jwt_required()
-def get_book(book_id):  # Get a book
-    app.logger.info(f'User {current_identity.username} getting book {book_id} information')
-    book = Book.query.get(book_id)
-    if not book:
-        app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
-    app.logger.info(f'SUCCESS : Book {book.title} information returned to user {current_identity.username}')
-    return print_book(book)
+# @app.route('/book/<int:book_id>', methods=['GET'])
+# @jwt_required()
+# def get_book(book_id):  # Get a book
+#     app.logger.info(f'User {current_identity.username} getting book {book_id} information')
+#     book = Book.query.get(book_id)
+#     if not book:
+#         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
+#         return {'message': 'book not found'}, 404
+#     app.logger.info(f'SUCCESS : Book {book.title} information returned to user {current_identity.username}')
+#     return print_book(book)
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
@@ -90,6 +88,10 @@ def remove_book(book_id):  # Remove a book
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book.title} already removed')
         return {'message': 'book already removed'}, 400
 
+    if get_active_lending(book):
+        app.logger.info(f'FAIL : User {current_identity.username} queried book {book.title} currently checked out')
+        return {'message': 'checked out book cannot be removed'}, 400
+
     release(book, current_identity.id, 'cancel')
 
     book.active = False
@@ -102,11 +104,11 @@ def remove_book(book_id):  # Remove a book
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
 @jwt_required()
 def lend_book(book_id):  # Lend a book
-    app.logger.info(f'User {current_identity.username} lending a book {book_id}')
+    app.logger.info(f'User {current_identity.username} lending out a book {book_id}')
     data = request.get_json()
     try:
-        borrower_id = data['borrower_id']
-    except KeyError:
+        username = data['borrower']
+    except (KeyError, TypeError):
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
         return {'message': 'invalid data'}, 400
 
@@ -114,10 +116,10 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    user = User.query.get(borrower_id)
+    user = User.query.filter_by(username=username).first()
 
     if not user:
-        app.logger.info(f'FAIL : User {current_identity.username} queried user {borrower_id} not found')
+        app.logger.info(f'FAIL : User {current_identity.username} queried user {username} not found')
         return {'message': 'user not found'}, 404
 
     if not user.borrower:
@@ -129,7 +131,7 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
         return {'message': 'book not found'}, 404
 
-    return checkout(book, borrower_id)
+    return checkout(book, user.id)
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])

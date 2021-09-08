@@ -15,7 +15,8 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'deadline': date.today() + timedelta(weeks=4)
+                'deadline': date.today() + timedelta(weeks=4),
+                'message': 'book successfully checked out'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book or returned unexpected information')
@@ -37,7 +38,8 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'deadline': date.today() + timedelta(weeks=4)
+                'deadline': date.today() + timedelta(weeks=4),
+                'message': 'book successfully checked out'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book with a reservation')
@@ -73,7 +75,8 @@ class UtilitiesTest(BaseTest):
                 'book': 'Test Book',
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
-                'date_end': None
+                'date_end': None,
+                'message': 'book successfully reserved'
             }
             self.assertDictEqual(ut.reserve(book, 2), expected,
                                  'Unable to reserve a book')
@@ -122,12 +125,7 @@ class UtilitiesTest(BaseTest):
 
             # Mark a book as returned as the book owner
             ut.save_to_db(Lending(book_id=1, user_id=2))
-            expected2 = {
-                'book': 'Test Book',
-                'user': 'Test Borrower',
-                'date_begin': date.today(),
-                'date_end': date.today()
-            }
+            expected2 = {'message': 'book is now available'}
             self.assertDictEqual(ut.release(book, 1, 'return'), expected2,
                                  'Unable to mark book as returned as a book owner')
 
@@ -163,12 +161,7 @@ class UtilitiesTest(BaseTest):
 
             # Cancel a reservation as a book owner
             ut.save_to_db(Reservation(book_id=1, user_id=2))
-            expected2 = {
-                'book': 'Test Book',
-                'user': 'Test Borrower',
-                'date_begin': date.today(),
-                'date_end': date.today()
-            }
+            expected2 = {'message': 'book is now available'}
             self.assertDictEqual(ut.release(book, 1, 'cancel'), expected2,
                                  'Unable to cancel reservation as a book owner')
 
@@ -251,7 +244,11 @@ class UtilitiesTest(BaseTest):
                 'author': 'Test Author',
                 'year': 2021,
                 'owner': 'Test Lender',
-                'active': True
+                'active': True,
+                'lending': None,
+                'deadline': None,
+                'overtime': False,
+                'reservation': None
             }
             self.assertDictEqual(ut.print_book(book), expected,
                                  'Returned unexpected information')
@@ -267,9 +264,13 @@ class UtilitiesTest(BaseTest):
                         'author': 'Test Author',
                         'year': 2021,
                         'owner': 'Test Lender',
-                        'active': True
+                        'active': True,
+                        'lending': None,
+                        'deadline': None,
+                        'overtime': False,
+                        'reservation': None
                     }
                 ]
             }
-            self.assertDictEqual(ut.print_book_list(books), expected,
+            self.assertDictEqual(ut.print_books(books), expected,
                                  'Returned unexpected information')
