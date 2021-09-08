@@ -1,24 +1,26 @@
 <template>
   <div>
-    <p>{{ msg }}</p>
-    <br>
+    <hr>
+    <div v-bind:class="alert" role="alert" v-if="msg !== ''">
+      {{ msg }}
+    </div>
     <div v-show="bookIsOut">
-      <p>Raamat on valja laenutatud.</p>
+      <p>Raamat on välja laenutatud.</p>
       <div v-if="showAdditional">
-        <p>Laenutuse tahtaeg: {{ book.deadline }}</p>
-        <a href="javascript:void(0)" @click="returnBook(book.id)">Margi tagastatuks</a>
+        <p>Laenutuse tähtaeg: {{ book.deadline }}</p>
+        <a href="javascript:void(0)" @click="returnBook(book.id)">Märgi tagastatuks</a>
       </div>
     </div>
     <div v-show="bookIsReserved">
       <p>Raamat on broneeritud.</p>
       <div v-if="showAdditional">
-        <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tyhista broneering</a>
+        <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tühista broneering</a>
       </div>
     </div>
     <div v-show="!bookIsOut && !bookIsReserved">
       <a href="javascript:void(0)"
          @click="lendBook(book.id)"
-         v-if="showForLender">Margi raamat laenutatuks</a>
+         v-if="showForLender">Märgi raamat laenutatuks</a>
       <a href="javascript:void(0)"
          @click="borrowBook(book.id)"
          v-if="showForBorrower">Laenuta raamat</a><br>
@@ -27,18 +29,18 @@
          v-if="showForBorrower">Broneeri raamat</a>
     </div>
   </div>
-
 </template>
 
 <script>
 import axios from "axios";
-import {showForLender, showForBorrower} from "../utils";
+import {showForLender, showForBorrower, alertClass} from "../utils";
 
 export default {
   name: 'ExpandedBook',
   data() {
     return {
-      msg: ''
+      msg: '',
+      alert: "alert alert-primary"
     }
   },
   props: {
@@ -75,6 +77,7 @@ export default {
           this.book.lending = res.data.user
           this.book.deadline = res.data.deadline
         }
+      this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
     async borrowBook(id) {
@@ -83,6 +86,7 @@ export default {
         this.book.lending = res.data.user
         this.book.deadline = res.data.deadline
       }
+      this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
     async reserveBook(id) {
@@ -90,6 +94,7 @@ export default {
       if (res.status === 200) {
         this.book.reservation = res.data.user
       }
+      this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
     async returnBook(id) {
@@ -97,6 +102,7 @@ export default {
       if (res.status === 200) {
           this.book.lending = null
         }
+      this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
     async cancelReservation(id) {
@@ -104,8 +110,15 @@ export default {
       if (res.status === 200) {
           this.book.reservation = null
         }
+      this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
   }
 }
 </script>
+<style scoped>
+.alert {
+  width: 100%;
+  margin: 15px 0px;
+}
+</style>

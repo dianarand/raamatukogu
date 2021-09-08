@@ -7,6 +7,10 @@
           @btn-click="$emit('toggle-add-book')"
           :text="showAddBook ? 'Sulge' : 'Lisa raamat'"/>
       </h1>
+      <div v-bind:class="alert" role="alert" v-if="msg !== ''">
+        {{ msg }}
+        <button type="button" class="btn-close" @click="clearMessage" aria-label="Close"></button>
+      </div>
       <AddBook
         v-show="showAddBook"
         @setMessage="setMessage"
@@ -26,31 +30,11 @@
   </div>
 </template>
 
-<!--<template>-->
-<!--  <div class="container">-->
-<!--    <div class="header">-->
-<!--      <h2>{{ title }}</h2>-->
-      <Button v-show="hasAddBook"
-        @btn-click="$emit('toggle-add-book')"
-        :text="showAddBook ? 'Sulge' : 'Lisa raamat'"
-        :color="showAddBook ? 'red' : 'green'"/>
-<!--    </div>-->
-<!--    <p>{{ msg }}</p>-->
-    <AddBook
-        v-show="showAddBook"
-        @setMessage="setMessage"
-        @addBook="addBook"
-        @hideAddBook="$emit('toggle-add-book')"
-    />
-<!--    -->
-<!--  </div>-->
-<!--</template>-->
-
 <script>
 import Button from "./Button";
 import AddBook from "./AddBook";
 import Book from "./Book";
-import {showForLender} from "../utils";
+import {showForLender, alertClass} from "../utils";
 import axios from "axios";
 
 export default {
@@ -59,7 +43,7 @@ export default {
     title: String,
     hasAddBook: Boolean,
     showAddBook: Boolean,
-    bookFilter: String,
+    bookFilter: String
   },
   components: {
     Button,
@@ -73,11 +57,16 @@ export default {
     return {
       books: [],
       msg: '',
+      alert: "alert alert-primary"
     }
   },
   methods: {
-    setMessage(message) {
-      this.msg = message
+    setMessage(response) {
+      this.alert = alertClass(response.status) + ' alert-dismissible fade show'
+      this.msg = response.data.message
+    },
+    clearMessage() {
+      this.msg = ''
     },
     async fetchBooks() {
       try {
@@ -105,5 +94,10 @@ export default {
   width: auto;
   max-width: 460px;
   margin: auto;
+}
+.alert {
+  width: 100%;
+  max-width: 450px;
+  margin: 15px auto;
 }
 </style>

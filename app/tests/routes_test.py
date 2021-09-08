@@ -15,7 +15,7 @@ class AuthorisationTest(BaseTest):
                                   headers={'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 201)
                 self.assertIsNotNone(User.query.filter_by(username='lender'))
-                self.assertDictEqual(json.loads(response.data), {'message': 'user created successfully'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Kasutaja loodud edukalt'})
 
     def test_register_and_login(self):
         with self.app() as a:
@@ -39,7 +39,7 @@ class AuthorisationTest(BaseTest):
                                       {'username': 'lender', 'password': 'pass', 'role': 'lender'}),
                                   headers={'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 400)
-                self.assertDictEqual(json.loads(response.data), {'message': 'username already in use'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Kasutajanimi juba kasutuses'})
 
 
 class RoutesTest(BaseTest):
@@ -71,7 +71,7 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to add book with missing information
                 auth_request2 = a.post('/login',
@@ -83,7 +83,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 400)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'invalid data posted'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Puudulikud andmed'})
 
                 # Add a book
                 response3 = a.post('/books',
@@ -91,7 +91,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response3.status_code, 201)
-                self.assertDictEqual(json.loads(response3.data), {'message': 'book added successfully'})
+                self.assertDictEqual(json.loads(response3.data), {'message': 'Raamat lisatud edukalt'})
 
     # def test_get_book(self):
     #     with self.app() as a:
@@ -106,7 +106,7 @@ class RoutesTest(BaseTest):
     #                              headers={'Authorization': auth_header,
     #                                       'Content-Type': 'application/json'})
     #             self.assertEqual(response.status_code, 404)
-    #             self.assertDictEqual(json.loads(response.data), {'message': 'book not found'})
+    #             self.assertDictEqual(json.loads(response.data), {'message': 'Raamatut ei leitud'})
     #
     #             # Get a book
     #             response = a.get('/book/1',
@@ -139,7 +139,7 @@ class RoutesTest(BaseTest):
                                     headers={'Authorization': auth_header,
                                              'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to remove a non-existent book
                 auth_request2 = a.post('/login',
@@ -150,14 +150,14 @@ class RoutesTest(BaseTest):
                                      headers={'Authorization': auth_header2,
                                               'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 404)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Raamatut ei leitud'})
 
                 # Attempt to remove a book owned by another user
                 response3 = a.delete('/book/1',
                                      headers={'Authorization': auth_header2,
                                               'Content-Type': 'application/json'})
                 self.assertEqual(response3.status_code, 401)
-                self.assertDictEqual(json.loads(response3.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response3.data), {'message': 'Puuduvad õigused'})
 
                 # Remove a book
                 save_to_db(Book(title='Test Book', author='Test Author', year=2021, owner_id=3))
@@ -165,14 +165,14 @@ class RoutesTest(BaseTest):
                                      headers={'Authorization': auth_header2,
                                               'Content-Type': 'application/json'})
                 self.assertEqual(response4.status_code, 200)
-                self.assertDictEqual(json.loads(response4.data), {'message': 'book successfully removed'})
+                self.assertDictEqual(json.loads(response4.data), {'message': 'Raamat eemaldatud edukalt'})
 
                 # Attempt to remove an already removed book
                 response5 = a.delete('/book/2',
                                      headers={'Authorization': auth_header2,
                                               'Content-Type': 'application/json'})
                 self.assertEqual(response5.status_code, 400)
-                self.assertDictEqual(json.loads(response5.data), {'message': 'book already removed'})
+                self.assertDictEqual(json.loads(response5.data), {'message': 'Raamatut juba eemaldatud'})
 
     def test_lend_book(self):
         with self.app() as a:
@@ -192,7 +192,7 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to lend a book without providing a borrower
                 auth_request2 = a.post('/login',
@@ -212,7 +212,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response3.status_code, 404)
-                self.assertDictEqual(json.loads(response3.data), {'message': 'user not found'})
+                self.assertDictEqual(json.loads(response3.data), {'message': 'Kasutajat ei leitud'})
 
                 # Attempt to lend a book owned by another user
                 response4 = a.post('/book/1/lend',
@@ -220,7 +220,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response4.status_code, 404)
-                self.assertDictEqual(json.loads(response4.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response4.data), {'message': 'Raamatut ei leitud'})
 
                 # Attempt to lend a non-existent book
                 response5 = a.post('/book/10/lend',
@@ -228,7 +228,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response5.status_code, 404)
-                self.assertDictEqual(json.loads(response4.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response4.data), {'message': 'Raamatut ei leitud'})
 
                 # Lend a book
                 response6 = a.post('/book/2/lend',
@@ -254,7 +254,7 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to borrow a non-existent book
                 auth_request2 = a.post('/login',
@@ -265,7 +265,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 404)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Raamatut ei leitud'})
 
                 # Borrow a book
                 response3 = a.post('/book/2/borrow',
@@ -292,14 +292,14 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to return a non-existent book
                 response2 = a.post('/book/10/return',
                                    headers={'Authorization': auth_header,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 404)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Raamatut ei leitud'})
 
                 # Return a book
                 response3 = a.post('/book/2/return',
@@ -307,7 +307,7 @@ class RoutesTest(BaseTest):
                                             'Content-Type': 'application/json'})
                 result = json.loads(response3.data)
                 self.assertEqual(response3.status_code, 200)
-                self.assertEqual(result, {'message': 'book is now available'})
+                self.assertEqual(result, {'message': 'Raamat on nüüd saadaval'})
 
     def test_reserve_book(self):
         with self.app() as a:
@@ -321,7 +321,7 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 401)
-                self.assertDictEqual(json.loads(response.data), {'message': 'unauthorized'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Puuduvad õigused'})
 
                 # Attempt to reserve a non-existent book
                 auth_request2 = a.post('/login',
@@ -332,7 +332,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 404)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Raamatut ei leitud'})
 
                 # Reserve a book
                 response3 = a.post('/book/1/reserve',
@@ -356,7 +356,7 @@ class RoutesTest(BaseTest):
                                   headers={'Authorization': auth_header,
                                            'Content-Type': 'application/json'})
                 self.assertEqual(response.status_code, 404)
-                self.assertDictEqual(json.loads(response.data), {'message': 'book not found'})
+                self.assertDictEqual(json.loads(response.data), {'message': 'Raamatut ei leitud'})
 
                 # Cancel a reservation
                 save_to_db(Reservation(book_id=1, user_id=4))
@@ -365,4 +365,4 @@ class RoutesTest(BaseTest):
                                             'Content-Type': 'application/json'})
                 result = json.loads(response2.data)
                 self.assertEqual(response2.status_code, 200)
-                self.assertEqual(result, {'message': 'book is now available'})
+                self.assertEqual(result, {'message': 'Raamat on nüüd saadaval'})

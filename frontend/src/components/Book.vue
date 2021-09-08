@@ -1,4 +1,3 @@
-
 <template>
   <li class="list-group-item list-group-item-action d-flex gap-3 py-3">
     <div class="d-flex gap-2 w-100 justify-content-between">
@@ -27,27 +26,6 @@
     </div>
   </li>
 </template>
-
-<!--<template>-->
-<!--  <div @dblclick="toggleExpanded()" class="book">-->
-<!--    <h3>-->
-<!--      {{ book.title }}-->
-<!--      <div role="group">-->
-<!--        <i @click="toggleExpanded()"-->
-<!--           class="fas fa-chevron-down"></i>-->
-<!--        <i @click="removeBook(book.id)"-->
-<!--           v-if="ableToRemove"-->
-<!--            class="fas fa-times"></i>-->
-<!--      </div>-->
-<!--    </h3>-->
-<!--    <p>{{ book.author }} ({{ book.year }})</p>-->
-    <ExpandedBook
-        v-show="showExpanded"
-        :book="book"
-        :showAdditional="showAdditional"
-    />
-<!--  </div>-->
-<!--</template>-->
 
 <script>
 import ExpandedBook from './ExpandedBook'
@@ -84,7 +62,7 @@ export default {
         if (res.status === 200) {
           this.$emit('removeBook', id)
         }
-        this.$emit('setMessage', res.data.message)
+        this.$emit('setMessage', res)
       }
     },
     toggleExpanded() {

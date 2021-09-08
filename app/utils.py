@@ -4,7 +4,7 @@ from app import app
 from app.db import db
 from app.models import Lending, Reservation
 
-unavailable_message = {'message': 'book unavailable'}
+unavailable_message = {'message': 'Raamat pole saadaval'}
 
 
 def checkout(book, borrower_id):  # check a book out from the library
@@ -29,7 +29,7 @@ def checkout(book, borrower_id):  # check a book out from the library
     lending_json = print_usage(lending)
     lending_json.update({
         'deadline': lending.deadline,
-        'message': 'book successfully checked out'
+        'message': 'Raamat edukalt laenutatud'
     })
 
     app.logger.info(f'SUCCESS : Book {book.title} borrowed to user {borrower_id}')
@@ -49,7 +49,7 @@ def reserve(book, user_id):
 
     app.logger.info(f'SUCCESS : Book {book.title} reserved by user {user_id}')
     lending_json = print_usage(reservation)
-    lending_json.update({'message': 'book successfully reserved'})
+    lending_json.update({'message': 'Raamat edukalt broneeritud'})
     return lending_json
 
 
@@ -58,23 +58,23 @@ def release(book, user_id, usage):  # release a book from a user
         current_use = get_active_lending(book)
         if not current_use:
             app.logger.info(f'FAIL : Book {book.title} not checked out')
-            return {'message': 'book is not checked out'}, 400
+            return {'message': 'Raamat ei ole välja laenatud'}, 400
 
     elif usage == 'cancel':
         current_use = get_active_reservation(book)
         if not current_use:
             app.logger.info(f'FAIL : Book {book.title} not reserved')
-            return {'message': 'book has not been reserved'}, 400
+            return {'message': 'Raamat ei ole broneeritud'}, 400
 
     if user_id != book.owner_id and user_id != current_use.user_id:
         app.logger.info(f'FAIL : User {user_id} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     current_use.date_end = date.today()
     save_to_db(current_use)
 
     app.logger.info(f'SUCCESS : Book {book.title} is made available')
-    return {'message': 'book is now available'}
+    return {'message': 'Raamat on nüüd saadaval'}
 
 
 def get_active_lending(book):

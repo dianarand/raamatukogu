@@ -34,7 +34,7 @@ def add_book():  # Create a new book
     app.logger.info(f'User {current_identity.username} adding a new book')
     if not current_identity.lender:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     data = request.get_json()
     try:
@@ -46,12 +46,12 @@ def add_book():  # Create a new book
         )
     except KeyError:
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
-        return {'message': 'invalid data posted'}, 400
+        return {'message': 'Puudulikud andmed'}, 400
 
     save_to_db(book)
 
     app.logger.info(f'SUCCESS : Book {book.title} added')
-    return {'message': 'book added successfully'}, 201
+    return {'message': 'Raamat lisatud edukalt'}, 201
 
 
 # @app.route('/book/<int:book_id>', methods=['GET'])
@@ -61,7 +61,7 @@ def add_book():  # Create a new book
 #     book = Book.query.get(book_id)
 #     if not book:
 #         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-#         return {'message': 'book not found'}, 404
+#         return {'message': 'Raamatut ei leitud'}, 404
 #     app.logger.info(f'SUCCESS : Book {book.title} information returned to user {current_identity.username}')
 #     return print_book(book)
 
@@ -72,25 +72,25 @@ def remove_book(book_id):  # Remove a book
     app.logger.info(f'User {current_identity.username} removing book {book_id}')
     if not current_identity.lender:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     if book.owner_id != current_identity.id:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     if not book.active:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book.title} already removed')
-        return {'message': 'book already removed'}, 400
+        return {'message': 'Raamatut juba eemaldatud'}, 400
 
     if get_active_lending(book):
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book.title} currently checked out')
-        return {'message': 'checked out book cannot be removed'}, 400
+        return {'message': 'Väljalaenutatud raamatut ei saa eemaldada'}, 400
 
     release(book, current_identity.id, 'cancel')
 
@@ -98,7 +98,7 @@ def remove_book(book_id):  # Remove a book
     save_to_db(book)
 
     app.logger.info(f'SUCCESS : User {current_identity.username} removed book {book.title} successfully')
-    return {'message': 'book successfully removed'}
+    return {'message': 'Raamat eemaldatud edukalt'}
 
 
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
@@ -114,22 +114,22 @@ def lend_book(book_id):  # Lend a book
 
     if not current_identity.lender:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     user = User.query.filter_by(username=username).first()
 
     if not user:
         app.logger.info(f'FAIL : User {current_identity.username} queried user {username} not found')
-        return {'message': 'user not found'}, 404
+        return {'message': 'Kasutajat ei leitud'}, 404
 
     if not user.borrower:
         app.logger.info(f'FAIL : User {user.borrower} not a valid borrower')
-        return {'message': 'invalid borrower'}, 400
+        return {'message': 'Ebasobiv laenutaja'}, 400
 
     book = current_identity.owned_books.filter_by(id=book_id).first()
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     return checkout(book, user.id)
 
@@ -140,13 +140,13 @@ def borrow_book(book_id):  # Borrow a book
     app.logger.info(f'User {current_identity.username} borrowing a book')
     if not current_identity.borrower:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     return checkout(book, current_identity.id)
 
@@ -159,7 +159,7 @@ def return_book(book_id):  # Return a book
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     return release(book, current_identity.id, 'return')
 
@@ -169,13 +169,13 @@ def return_book(book_id):  # Return a book
 def reserve_book(book_id):  # Reserve a book
     if not current_identity.borrower:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
-        return {'message': 'unauthorized'}, 401
+        return {'message': 'Puuduvad õigused'}, 401
 
     book = Book.query.get(book_id)
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     return reserve(book, current_identity.id)
 
@@ -188,7 +188,7 @@ def cancel_reservation(book_id):  # Cancel a reservation
 
     if not book:
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-        return {'message': 'book not found'}, 404
+        return {'message': 'Raamatut ei leitud'}, 404
 
     return release(book, current_identity.id, 'cancel')
 
@@ -202,7 +202,7 @@ def register_user():  # Create a new user
     duplicates = User.query.filter_by(username=username).first()
     if duplicates:
         app.logger.info('FAIL : Duplicate username')
-        return {'message': 'username already in use'}, 400
+        return {'message': 'Kasutajanimi juba kasutuses'}, 400
 
     if data['role'] == 'lender':
         lender = True
@@ -222,4 +222,4 @@ def register_user():  # Create a new user
     save_to_db(user)
 
     app.logger.info(f'SUCCESS : User {user.username} created')
-    return {'message': 'user created successfully'}, 201
+    return {'message': 'Kasutaja loodud edukalt'}, 201

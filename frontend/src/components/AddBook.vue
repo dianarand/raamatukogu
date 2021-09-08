@@ -55,7 +55,7 @@ export default {
 
       const res = await axios.post('books', book)
 
-      this.$emit('setMessage', res.data.message)
+      this.$emit('setMessage', res)
 
       if (res.status === 201) {
         this.$emit('addBook', book)
