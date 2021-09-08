@@ -2,7 +2,6 @@
   <main class="form-signin">
     <form @submit.prevent="onSubmit">
       <h1 class="h3 mb-3 fw-normal">Logi sisse</h1>
-
       <div class="form-floating">
         <input type="username" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
         <label for="username">Kasutajatunnus</label>
@@ -15,7 +14,6 @@
     </form>
   </main>
   <p>Pole veel kasutajat? <router-link to="/register">Registreeru</router-link></p>
-
 </template>
 
 <script>
@@ -59,7 +57,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 html,
 body {
@@ -72,28 +69,5 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   background-color: #f5f5f5;
-}
-
-.form-signin {
-  width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  margin: auto;
-}
-
-.form-signin .form-floating:focus-within {
-  z-index: 2;
-}
-
-.form-signin input[type="text"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 </style>
