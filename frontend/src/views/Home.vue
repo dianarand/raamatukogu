@@ -1,5 +1,4 @@
 <template>
-  <a href="javascript:void(0)" @click="logOut">Logi välja</a>
   <Search v-if="showForBorrower"/>
   <Books
       @toggle-add-book="toggleAddBook"
@@ -50,11 +49,7 @@ export default {
   methods: {
     toggleAddBook() {
       this.showAddBook = !this.showAddBook
-    },
-    logOut() {
-      localStorage.removeItem('token');
-      this.$router.push('/login')
-    },
+    }
   }
 }
 </script>

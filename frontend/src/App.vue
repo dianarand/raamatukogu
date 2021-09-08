@@ -1,17 +1,15 @@
 <template>
-  <header>
-    <h1>Raamatute laenutus</h1>
-  </header>
+  <Header />
   <router-view></router-view>
 </template>
 
 <script>
-import Box from './components/Books'
+import Header from './components/Header'
 
 export default {
   name: 'App',
   components: {
-    Box
+    Header
   },
   methods: {
     toggleAddBook() {
