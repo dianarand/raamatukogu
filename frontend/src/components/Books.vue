@@ -1,30 +1,50 @@
 <template>
-  <div class="container">
-    <div class="header">
-      <h2>{{ title }}</h2>
+  <div class="p-2 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-2">
+      <h1 class="display-5 fw-bold">
+        {{ title }}
+        <Button v-show="hasAddBook"
+          @btn-click="$emit('toggle-add-book')"
+          :text="showAddBook ? 'Sulge' : 'Lisa raamat'"/>
+      </h1>
+      <AddBook
+        v-show="showAddBook"
+        @setMessage="setMessage"
+        @addBook="addBook"
+        @hideAddBook="$emit('toggle-add-book')"
+      />
+      <ul class="list-group" :key="book.id" v-for="book in books">
+        <Book
+            :book="book"
+            :hasRemoveBook="showForLender"
+            :showAdditional="true"
+            @setMessage="setMessage"
+            @removeBook="removeBook"
+        />
+      </ul>
+    </div>
+  </div>
+</template>
+
+<!--<template>-->
+<!--  <div class="container">-->
+<!--    <div class="header">-->
+<!--      <h2>{{ title }}</h2>-->
       <Button v-show="hasAddBook"
         @btn-click="$emit('toggle-add-book')"
         :text="showAddBook ? 'Sulge' : 'Lisa raamat'"
         :color="showAddBook ? 'red' : 'green'"/>
-    </div>
-    <p>{{ msg }}</p>
+<!--    </div>-->
+<!--    <p>{{ msg }}</p>-->
     <AddBook
         v-show="showAddBook"
         @setMessage="setMessage"
         @addBook="addBook"
         @hideAddBook="$emit('toggle-add-book')"
     />
-    <ul class="list-group" :key="book.id" v-for="book in books">
-      <Book
-          :book="book"
-          :hasRemoveBook="showForLender"
-          :showAdditional="true"
-          @setMessage="setMessage"
-          @removeBook="removeBook"
-      />
-    </ul>
-  </div>
-</template>
+<!--    -->
+<!--  </div>-->
+<!--</template>-->
 
 <script>
 import Button from "./Button";
