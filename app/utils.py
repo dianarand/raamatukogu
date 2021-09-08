@@ -48,7 +48,8 @@ def reserve(book, user_id):
     save_to_db(reservation)
 
     app.logger.info(f'SUCCESS : Book {book.title} reserved by user {user_id}')
-    lending_json = print(reservation).update({'message': 'book successfully reserved'})
+    lending_json = print_usage(reservation)
+    lending_json.update({'message': 'book successfully reserved'})
     return lending_json
 
 
@@ -110,7 +111,7 @@ def print_book(book):  # return book information to JSON
     return data
 
 
-def print_book_list(books):
+def print_books(books):
     book_list = []
     for book in books:
         book_list.append(print_book(book))

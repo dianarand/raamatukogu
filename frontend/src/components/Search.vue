@@ -46,35 +46,7 @@ export default {
       const query = `${this.property}=${this.search}`
       const res = await axios.get(`books?${query}`)
       this.result = res.data.books
-      console.log(this.result)
-
     },
   }
 }
 </script>
-
-<style scoped>
-.add-form {
-  margin-bottom: 40px;
-}
-.form-control {
-  margin: 20px 0;
-}
-.form-control label {
-  display: block;
-}
-.form-control input {
-  width: 100%;
-  height: 40px;
-  margin: 5px;
-  padding: 3px 7px;
-  font-size: 17px;
-}
-.form-control-check label {
-  flex: 1;
-}
-.form-control-check input {
-  flex: 2;
-  height: 20px;
-}
-</style>

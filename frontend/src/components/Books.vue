@@ -60,8 +60,12 @@ export default {
       this.msg = message
     },
     async fetchBooks() {
-      const res = await axios.get(`books?filter=${this.bookFilter}`)
-      this.books = res.data.books
+      try {
+        const res = await axios.get(`books?filter=${this.bookFilter}`)
+        this.books = res.data.books
+      } catch(err) {
+        this.$router.push('/login')
+      }
     },
     addBook(book) {
       this.books = [...this.books, book]

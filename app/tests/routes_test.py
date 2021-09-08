@@ -93,40 +93,39 @@ class RoutesTest(BaseTest):
                 self.assertEqual(response3.status_code, 201)
                 self.assertDictEqual(json.loads(response3.data), {'message': 'book added successfully'})
 
-    def test_get_book(self):
-        with self.app() as a:
-            with self.app_context():
-                auth_request = a.post('/login',
-                                      data=json.dumps({'username': 'borrower', 'password': 'pass2'}),
-                                      headers={'Content-Type': 'application/json'})
-                auth_header = f"JWT {json.loads(auth_request.data)['access_token']}"
-
-                # Attempt to get a non-existent book
-                response = a.get('/book/10',
-                                 headers={'Authorization': auth_header,
-                                          'Content-Type': 'application/json'})
-                self.assertEqual(response.status_code, 404)
-                self.assertDictEqual(json.loads(response.data), {'message': 'book not found'})
-
-                # Get a book
-                response = a.get('/book/1',
-                                 headers={'Authorization': auth_header,
-                                          'Content-Type': 'application/json'})
-                expected = {
-                    'id': 1,
-                    'title': 'Test Book',
-                    'author': 'Test Author',
-                    'year': 2021,
-                    'owner': 'Test Lender',
-                    'active': True,
-                    'lending': None,
-                    'deadline': None,
-                    'overtime': False,
-                    'reservation': None
-                }
-                self.assertEqual(response.status_code, 200)
-                self.assertDictEqual(json.loads(response.data), expected)
-                pass
+    # def test_get_book(self):
+    #     with self.app() as a:
+    #         with self.app_context():
+    #             auth_request = a.post('/login',
+    #                                   data=json.dumps({'username': 'borrower', 'password': 'pass2'}),
+    #                                   headers={'Content-Type': 'application/json'})
+    #             auth_header = f"JWT {json.loads(auth_request.data)['access_token']}"
+    #
+    #             # Attempt to get a non-existent book
+    #             response = a.get('/book/10',
+    #                              headers={'Authorization': auth_header,
+    #                                       'Content-Type': 'application/json'})
+    #             self.assertEqual(response.status_code, 404)
+    #             self.assertDictEqual(json.loads(response.data), {'message': 'book not found'})
+    #
+    #             # Get a book
+    #             response = a.get('/book/1',
+    #                              headers={'Authorization': auth_header,
+    #                                       'Content-Type': 'application/json'})
+    #             expected = {
+    #                 'id': 1,
+    #                 'title': 'Test Book',
+    #                 'author': 'Test Author',
+    #                 'year': 2021,
+    #                 'owner': 'Test Lender',
+    #                 'active': True,
+    #                 'lending': None,
+    #                 'deadline': None,
+    #                 'overtime': False,
+    #                 'reservation': None
+    #             }
+    #             self.assertEqual(response.status_code, 200)
+    #             self.assertDictEqual(json.loads(response.data), expected)
 
     def test_remove_book(self):
         with self.app() as a:
@@ -179,9 +178,9 @@ class RoutesTest(BaseTest):
         with self.app() as a:
             with self.app_context():
                 save_to_db(Book(title='Test Book', author='Test Author', year=2021, owner_id=3))
-                valid_data = json.dumps({'borrower_id': 4})
+                valid_data = json.dumps({'borrower': 'borrower'})
                 invalid_data = json.dumps({'user_id': 4})
-                invalid_data2 = json.dumps({'borrower_id': 10})
+                invalid_data2 = json.dumps({'borrower': 'borrower2'})
 
                 # Attempt to lend a book as a borrower
                 auth_request = a.post('/login',
@@ -309,7 +308,6 @@ class RoutesTest(BaseTest):
                 result = json.loads(response3.data)
                 self.assertEqual(response3.status_code, 200)
                 self.assertEqual(result, {'message': 'book is now available'})
-                self.assertIsNotNone(result['date_end'])
 
     def test_reserve_book(self):
         with self.app() as a:
@@ -344,7 +342,6 @@ class RoutesTest(BaseTest):
                 self.assertEqual(response3.status_code, 200)
                 self.assertEqual(result['book'], 'Test Book')
                 self.assertEqual(result['user'], 'borrower')
-                pass
 
     def test_cancel_reservation(self):
         with self.app() as a:
@@ -369,4 +366,3 @@ class RoutesTest(BaseTest):
                 result = json.loads(response2.data)
                 self.assertEqual(response2.status_code, 200)
                 self.assertEqual(result, {'message': 'book is now available'})
-                self.assertIsNotNone(result['date_end'])

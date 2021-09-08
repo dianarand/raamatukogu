@@ -1,8 +1,6 @@
 app.log
 /.idea/
 /venv/
-/app/static/
-/app/templates/
 /app/__pycache__/
 /app/data.db
 /frontend/node_modules/

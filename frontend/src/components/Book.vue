@@ -6,7 +6,7 @@
         <i @click="toggleExpanded()"
            class="fas fa-chevron-down"></i>
         <i @click="removeBook(book.id)"
-           v-if="hasRemoveBook"
+           v-if="ableToRemove"
             class="fas fa-times"></i>
       </div>
     </h3>
@@ -38,6 +38,15 @@ export default {
     hasRemoveBook: Boolean,
     showAdditional: Boolean
   },
+  computed: {
+    ableToRemove() {
+      if (this.hasRemoveBook && this.book.lending == null){
+        return true
+      } else {
+        return false
+      }
+    }
+  },
   methods: {
     async removeBook(id) {
       if(confirm('Kas olete kindel, et soovite eemaldada raamatu laenamise nimekirjast?')) {
@@ -52,7 +61,7 @@ export default {
       this.showExpanded = !this.showExpanded
     }
   },
-  emits: ['setMessage']
+  emits: ['removeBook', 'setMessage']
 }
 </script>
 

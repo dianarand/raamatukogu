@@ -15,7 +15,8 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'deadline': date.today() + timedelta(weeks=4)
+                'deadline': date.today() + timedelta(weeks=4),
+                'message': 'book successfully checked out'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book or returned unexpected information')
@@ -37,7 +38,8 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'deadline': date.today() + timedelta(weeks=4)
+                'deadline': date.today() + timedelta(weeks=4),
+                'message': 'book successfully checked out'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book with a reservation')
@@ -73,7 +75,8 @@ class UtilitiesTest(BaseTest):
                 'book': 'Test Book',
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
-                'date_end': None
+                'date_end': None,
+                'message': 'book successfully reserved'
             }
             self.assertDictEqual(ut.reserve(book, 2), expected,
                                  'Unable to reserve a book')
@@ -269,5 +272,5 @@ class UtilitiesTest(BaseTest):
                     }
                 ]
             }
-            self.assertDictEqual(ut.print_book_list(books), expected,
+            self.assertDictEqual(ut.print_books(books), expected,
                                  'Returned unexpected information')

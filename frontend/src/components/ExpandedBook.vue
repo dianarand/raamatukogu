@@ -11,7 +11,7 @@
     </div>
     <div v-show="bookIsReserved">
       <p>Raamat on broneeritud.</p>
-      <div>
+      <div v-if="showAdditional">
         <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tyhista broneering</a>
       </div>
     </div>
@@ -69,9 +69,7 @@ export default {
   },
   methods: {
     async lendBook(id) {
-      console.log('click')
       const borrower = prompt('Millisele kasutajale laenutad raamatu?', 'kasutajanimi')
-      console.log(borrower)
       const res = await axios.post(`book/${id}/lend`, {'borrower': borrower})
       if (res.status === 200) {
           this.book.lending = res.data.user
@@ -91,8 +89,6 @@ export default {
       const res = await axios.post(`book/${id}/reserve`)
       if (res.status === 200) {
         this.book.reservation = res.data.user
-        console.log(this.book.reservation)
-        console.log(this.bookIsReserved)
       }
       this.msg = res.data.message
     },
@@ -113,7 +109,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
