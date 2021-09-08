@@ -1,21 +1,23 @@
 <template>
-  <form @submit.prevent="onSubmit" class="add-form">
-    <div class="form-control">
-      <label>Pealkiri</label>
-      <input type="text" v-model="title" name="title" placeholder="Lisa raamat" />
-    </div>
-    <div class="form-control">
-      <label>Autor</label>
-      <input type="text" v-model="author" name="autor" placeholder="Lisa autor" />
-    </div>
-    <div class="form-control">
-      <label>Ilmumisaasta</label>
-      <input type="text" v-model="year" name="year" placeholder="Lisa ilmumisaasta" />
-    </div>
-    <input type="submit" value="Salvesta raamat" class="btn btn-block" />
-  </form>
+  <main class="form">
+    <form @submit.prevent="onSubmit">
+      <h1 class="h3 mb-3 fw-normal">Lisa uus raamat</h1>
+      <div class="form-floating">
+        <input type="text" v-model="title" class="form-control" id="title" placeholder="Pealkiri">
+        <label for="title">Pealkiri</label>
+      </div>
+      <div class="form-floating">
+        <input type="text" v-model="author" class="form-control" id="author" placeholder="Autor">
+        <label for="author">Autor</label>
+      </div>
+      <div class="form-floating">
+        <input type="number" min="1700" max="2050" v-model="year" class="form-control" id="year" placeholder="Ilmumisaasta">
+        <label for="author">Ilmumisaasta</label>
+      </div>
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Salvesta raamat</button>
+    </form>
+  </main>
 </template>
-
 <script>
 import axios from "axios";
 
@@ -68,3 +70,23 @@ export default {
   }
 }
 </script>
+<style scoped>
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+}
+
+.form input[type="number"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+</style>

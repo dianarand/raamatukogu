@@ -1,9 +1,9 @@
 <template>
-  <main class="form-signin">
+  <main class="form">
     <form @submit.prevent="onSubmit">
       <h1 class="h3 mb-3 fw-normal">Registreeru</h1>
       <div class="form-floating">
-        <input type="username" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
+        <input type="text" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
         <label for="username">Kasutajatunnus</label>
       </div>
       <div class="form-floating">
@@ -70,19 +70,6 @@ export default {
 }
 </script>
 <style scoped>
-html,
-body {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
-}
-
 #role-selection {
   padding: 5px 10px 20px 10px;
   margin-top: 5px;
