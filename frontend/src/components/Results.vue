@@ -4,7 +4,8 @@
       <h2>Otsingu tulemused</h2>
     </div>
     <div :key="book.id" v-for="book in books">
-      <Book :book="book" />
+      <Book :book="book"
+            :showAdditional="false"/>
     </div>
   </div>
 </template>

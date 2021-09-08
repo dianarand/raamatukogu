@@ -3,15 +3,19 @@
     <h3>
       {{ book.title }}
       <div role="group">
-        <i class="fas fa-undo-alt"></i>
-        <i @click="toggleExpanded()" class="fas fa-chevron-down"></i>
+        <i @click="toggleExpanded()"
+           class="fas fa-chevron-down"></i>
         <i @click="removeBook(book.id)"
            v-if="hasRemoveBook"
             class="fas fa-times"></i>
       </div>
     </h3>
     <p>{{ book.author }} ({{ book.year }})</p>
-    <ExpandedBook v-show="showExpanded" :book="book"/>
+    <ExpandedBook
+        v-show="showExpanded"
+        :book="book"
+        :showAdditional="showAdditional"
+    />
   </div>
 </template>
 
@@ -31,7 +35,8 @@ export default {
   },
   props: {
     book: Object,
-    hasRemoveBook: Boolean
+    hasRemoveBook: Boolean,
+    showAdditional: Boolean
   },
   methods: {
     async removeBook(id) {
@@ -46,15 +51,12 @@ export default {
     toggleExpanded() {
       this.showExpanded = !this.showExpanded
     }
-  }
-
+  },
+  emits: ['setMessage']
 }
 </script>
 
 <style scope>
-.fas {
-  color: red;
-}
 .book {
   background: #f4f4f4;
   margin: 5px;

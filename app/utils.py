@@ -27,7 +27,10 @@ def checkout(book, borrower_id):  # check a book out from the library
     save_to_db(lending)
 
     lending_json = print_usage(lending)
-    lending_json.update({'deadline': lending.deadline})
+    lending_json.update({
+        'deadline': lending.deadline,
+        'message': 'book successfully checked out'
+    })
 
     app.logger.info(f'SUCCESS : Book {book.title} borrowed to user {borrower_id}')
     return lending_json
@@ -45,7 +48,8 @@ def reserve(book, user_id):
     save_to_db(reservation)
 
     app.logger.info(f'SUCCESS : Book {book.title} reserved by user {user_id}')
-    return print_usage(reservation)
+    lending_json = print(reservation).update({'message': 'book successfully reserved'})
+    return lending_json
 
 
 def release(book, user_id, usage):  # release a book from a user

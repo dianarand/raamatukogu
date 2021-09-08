@@ -18,6 +18,7 @@
       <Book
           :book="book"
           :hasRemoveBook="showForLender"
+          :showAdditional="true"
           @setMessage="setMessage"
           @removeBook="removeBook"
       />

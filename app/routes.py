@@ -100,10 +100,10 @@ def remove_book(book_id):  # Remove a book
 @app.route('/book/<int:book_id>/lend', methods=['POST'])
 @jwt_required()
 def lend_book(book_id):  # Lend a book
-    app.logger.info(f'User {current_identity.username} lending a book {book_id}')
+    app.logger.info(f'User {current_identity.username} lending out a book {book_id}')
     data = request.get_json()
     try:
-        borrower_id = data['borrower_id']
+        username = data['borrower']
     except (KeyError, TypeError):
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
         return {'message': 'invalid data'}, 400
@@ -112,10 +112,10 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
         return {'message': 'unauthorized'}, 401
 
-    user = User.query.get(borrower_id)
+    user = User.query.filter_by(username=username).first()
 
     if not user:
-        app.logger.info(f'FAIL : User {current_identity.username} queried user {borrower_id} not found')
+        app.logger.info(f'FAIL : User {current_identity.username} queried user {username} not found')
         return {'message': 'user not found'}, 404
 
     if not user.borrower:
@@ -127,7 +127,7 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
         return {'message': 'book not found'}, 404
 
-    return checkout(book, borrower_id)
+    return checkout(book, user.id)
 
 
 @app.route('/book/<int:book_id>/borrow', methods=['POST'])
