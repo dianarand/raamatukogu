@@ -1,22 +1,21 @@
 <template>
-  <div class="container">
-    <div class="header">
-      <h2>Logi sisse</h2>
-    </div>
-    <form @submit.prevent="onSubmit" class="add-form">
-      <div class="form-control">
-        <label>Kasutajatunnus</label>
-        <input type="text" v-model="username" name="username" placeholder="Kasutajatunnus" />
+  <main class="form-signin">
+    <form @submit.prevent="onSubmit">
+      <h1 class="h3 mb-3 fw-normal">Logi sisse</h1>
+
+      <div class="form-floating">
+        <input type="username" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
+        <label for="username">Kasutajatunnus</label>
       </div>
-      <div class="form-control">
-        <label>Parool</label>
-        <input type="password" v-model="password" name="password" placeholder="Parool" />
+      <div class="form-floating">
+        <input type="password" v-model="password" class="form-control" id="password" placeholder="Parool">
+        <label for="password">Parool</label>
       </div>
-      <input type="submit" value="Logi sisse" class="btn btn-block" />
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Logi sisse</button>
     </form>
-    <p>Pole veel kasutajat?</p>
-    <h3><router-link to="/register">Registreeru</router-link></h3>
-  </div>
+  </main>
+  <p>Pole veel kasutajat? <router-link to="/register">Registreeru</router-link></p>
+
 </template>
 
 <script>
@@ -51,13 +50,50 @@ export default {
       if (res.status === 200) {
         localStorage.setItem('token', res.data.access_token)
         localStorage.setItem('role', res.data.role)
+        this.$router.push('/')
       }
 
       this.username = ''
       this.password = ''
-
-      this.$router.push('/')
     }
   }
 }
 </script>
+
+<style scoped>
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+</style>
