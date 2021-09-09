@@ -110,6 +110,9 @@ export default {
   },
   created() {
     this.fetchBooks()
+    if (this.showForLender === true) {
+      this.pageSize = 8;
+    }
   },
   emits: ['toggle-add-book'],
 }
