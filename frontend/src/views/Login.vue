@@ -31,25 +31,34 @@ export default {
     async onSubmit() {
 
       if (!this.username) {
-        alert('Sisesta kasutajanimi')
+        document.getElementById('username').className += " is-invalid"
+        document.getElementById('password').className += " is-invalid"
         return
+      } else {
+        document.getElementById('username').className = "form-control"
       }
 
       if (!this.password) {
-        alert('Sisesta parool')
+        document.getElementById('password').className += " is-invalid"
         return
+      } else {
+        document.getElementById('password').className = "form-control"
       }
 
-      const res = await axios.post('http://localhost:5000/login', {
-        username: this.username,
-        password: this.password
-      })
-
-      if (res.status === 200) {
-        localStorage.setItem('token', res.data.access_token)
-        localStorage.setItem('role', res.data.role);
-        axios.defaults.headers.common['Authorization'] = 'JWT ' + res.data.access_token;
-        this.$router.push('/');
+      try {
+        const res = await axios.post('http://localhost:5000/login', {
+          username: this.username,
+          password: this.password
+        })
+        if (res.status === 200) {
+          localStorage.setItem('token', res.data.access_token)
+          localStorage.setItem('role', res.data.role);
+          axios.defaults.headers.common['Authorization'] = 'JWT ' + res.data.access_token;
+          this.$router.push('/');
+        }
+      } catch {
+        document.getElementById('username').className += " is-invalid"
+        document.getElementById('password').className += " is-invalid"
       }
 
       this.username = ''
