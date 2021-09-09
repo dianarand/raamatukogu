@@ -11,13 +11,25 @@
           :book="book"
           :showAdditional="showAdditional"
           />
+          <div v-show="showRemove">
+            <hr>
+            <form @submit.prevent="removeBook(book.id)">
+              <div class="mb-3">
+                <label for="submit">Kas olete kindel, et soovite eemaldada raamatu laenamise nimekirjast?</label>
+              </div>
+              <div class="d-grid gap-2 d-md-block">
+                <button class="btn btn-danger float-start" type="submit" id="submit">Eemalda</button>
+                <button class="btn btn-outline-secondary float-end" type="button" @click="cancelRemove">Tühista</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
       <div class="text-nowrap">
         <div role="group">
           <i @click="toggleExpanded()"
              class="fas fa-info-circle"></i>
-          <i @click="removeBook(book.id)"
+          <i @click="openRemove"
              v-if="ableToRemove"
              class="fas fa-times"></i>
         </div>
@@ -38,7 +50,8 @@ export default {
   },
   data() {
     return {
-      showExpanded: false
+      showExpanded: false,
+      showRemove: false
     }
   },
   props: {
@@ -57,16 +70,24 @@ export default {
   },
   methods: {
     async removeBook(id) {
-      if(confirm('Kas olete kindel, et soovite eemaldada raamatu laenamise nimekirjast?')) {
+      try {
         const res = await axios.delete(`http://localhost:5000/book/${id}`)
         if (res.status === 200) {
           this.$emit('removeBook', id)
         }
         this.$emit('setMessage', res)
+      } catch(err) {
+        this.$emit('setMessage', err.response)
       }
     },
     toggleExpanded() {
       this.showExpanded = !this.showExpanded
+    },
+    openRemove() {
+      this.showRemove = true
+    },
+    cancelRemove() {
+      this.showRemove = false
     }
   },
   emits: ['removeBook', 'setMessage']
