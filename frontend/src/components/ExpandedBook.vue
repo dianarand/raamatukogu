@@ -17,9 +17,9 @@
         <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tühista broneering</a>
       </div>
     </div>
-    <div v-show="!bookIsOut && !bookIsReserved">
+    <div v-show="!bookIsOut && !bookIsReserved && !showLend">
       <a href="javascript:void(0)"
-         @click="lendBook(book.id)"
+         @click="openLend"
          v-if="showForLender">Märgi raamat laenutatuks</a>
       <a href="javascript:void(0)"
          @click="borrowBook(book.id)"
@@ -27,6 +27,18 @@
       <a href="javascript:void(0)"
          @click="reserveBook(book.id)"
          v-if="showForBorrower">Broneeri raamat</a>
+    </div>
+    <div v-show="showLend">
+      <form @submit.prevent="lendBook(book.id)">
+        <div class="mb-3">
+          <label for="username">Millisele kasutajale laenutad raamatu?</label>
+          <input type="text" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
+        </div>
+        <div class="d-grid gap-2 d-md-block">
+          <button class="btn btn-primary float-start" type="submit">Laenuta</button>
+          <button class="btn btn-outline-secondary float-end" type="button" @click="cancelLend">Tühista</button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -40,7 +52,9 @@ export default {
   data() {
     return {
       msg: '',
-      alert: "alert alert-primary"
+      alert: "alert alert-primary",
+      showLend: false,
+      username: '',
     }
   },
   props: {
@@ -70,15 +84,23 @@ export default {
     showForBorrower
   },
   methods: {
+    openLend() {
+      this.showLend = true
+    },
     async lendBook(id) {
-      const borrower = prompt('Millisele kasutajale laenutad raamatu?', 'kasutajanimi')
-      const res = await axios.post(`book/${id}/lend`, {'borrower': borrower})
-      if (res.status === 200) {
-          this.book.lending = res.data.user
-          this.book.deadline = res.data.deadline
-        }
-      this.alert = alertClass(res.status)
-      this.msg = res.data.message
+      try {
+        const res = await axios.post(`book/${id}/lend`, {'borrower': this.username})
+        if (res.status === 200) {
+            this.book.lending = res.data.user
+            this.book.deadline = res.data.deadline
+          }
+        this.alert = alertClass(res.status)
+        this.msg = res.data.message
+        this.showLend = false
+      } catch(err) {
+        this.alert = alertClass(err.response.status)
+        this.msg = err.response.data.message
+      }
     },
     async borrowBook(id) {
       const res = await axios.post(`book/${id}/borrow`)
@@ -113,6 +135,9 @@ export default {
       this.alert = alertClass(res.status)
       this.msg = res.data.message
     },
+    cancelLend() {
+      this.showLend = false;
+    }
   }
 }
 </script>
