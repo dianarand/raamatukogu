@@ -7,7 +7,7 @@
     <div v-show="bookIsOut">
       <p>Raamat on välja laenutatud.</p>
       <div v-if="showAdditional">
-        <p>Laenutuse tähtaeg: {{ book.deadline }}</p>
+        <p :style="{ color: bookColor}">Laenutuse tähtaeg: {{ book.deadline }}</p>
         <a href="javascript:void(0)" @click="returnBook(book.id)">Märgi tagastatuks</a>
       </div>
     </div>
@@ -64,6 +64,7 @@ export default {
   },
   props: {
     book: Object,
+    bookColor: String,
     showAdditional: Boolean
   },
   computed: {

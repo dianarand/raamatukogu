@@ -1,7 +1,7 @@
 <template>
   <li @dblclick="toggleExpanded()" class="list-group-item list-group-item-action d-flex gap-3 py-3">
     <div class="d-flex gap-2 w-100 justify-content-between">
-      <i class="fas fa-book fa-3x"></i>
+      <i class="fas fa-book fa-3x" :style="{ color: bookColor}"></i>
       <div>
         <h5 class="mb-1">{{ book.title }}</h5>
         <p class="mb-1">{{ book.author }}</p>
@@ -10,6 +10,7 @@
           v-show="showExpanded"
           :book="book"
           :showAdditional="showAdditional"
+          :bookColor="bookColor"
           />
           <div v-show="showRemove">
             <hr>
@@ -66,6 +67,13 @@ export default {
       } else {
         return false
       }
+    },
+    bookColor() {
+      if (this.book.overtime === true && this.showAdditional === true) {
+        return "#dc3545";
+      } else {
+        return "black";
+      }
     }
   },
   methods: {
@@ -95,6 +103,7 @@ export default {
 </script>
 
 <style scoped>
+
 i {
   margin: 5px;
 }
