@@ -1,5 +1,9 @@
 <template>
   <main class="form">
+    <div class="alert alert-warning" role="alert" v-if="msg !== ''">
+      {{ msg }}
+      <button type="button" class="btn-close btn-sm float-end" @click="clearMessage"></button>
+    </div>
     <form @submit.prevent="onSubmit">
       <h1 class="h3 mb-3 fw-normal">Registreeru</h1>
       <div class="form-floating">
@@ -13,13 +17,13 @@
       <div class="text-start" id="role-selection">
         <label>Soovin:</label>
         <div class="form-check">
-          <input class="form-check-input" type="radio" v-model="role" name="role" id="borrower">
+          <input class="form-check-input" type="radio" v-model="role" value="borrower" name="role" id="borrower">
           <label class="form-check-label" for="borrower">
             Laenata raamatuid
           </label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" v-model="role" name="role" id="lender">
+          <input class="form-check-input" type="radio" v-model="role" value="lender" name="role" id="lender">
           <label class="form-check-label" for="lender">
             Laenutada välja oma raamatuid
           </label>
@@ -41,30 +45,52 @@ export default {
       username: '',
       password: '',
       role: '',
+      msg: ''
     }
   },
   methods: {
     async onSubmit() {
-      if(!this.username) {
-        alert('Sisesta kasutajanimi')
+      if (!this.username) {
+        document.getElementById('username').className += " is-invalid"
+        document.getElementById('password').className += " is-invalid"
+        return
+      } else {
+        document.getElementById('username').className = "form-control"
+      }
+
+      if (!this.password) {
+        document.getElementById('password').className += " is-invalid"
+        return
+      } else {
+        document.getElementById('password').className = "form-control"
+      }
+
+      if (!this.role) {
+        this.setMessage("Rolli valik on kohustuslik")
         return
       }
 
-      if(!this.password) {
-        alert('Sisesta parool')
-        return
+      try {
+        const res = await axios.post('register', {
+          username: this.username,
+          password: this.password,
+          role: this.role
+        })
+        if (res.status === 201) {
+          this.$router.push('/login');
+        }
+      } catch(err) {
+        this.setMessage(err.response.data.message)
       }
-
-      const res = await axios.post('register', {
-        username: this.username,
-        password: this.password,
-        role: this.role
-      })
 
       this.username = ''
       this.password = ''
-
-      this.$router.push('/login')
+    },
+    setMessage(message) {
+      this.msg = message
+    },
+    clearMessage() {
+      this.msg = ''
     }
   }
 }
