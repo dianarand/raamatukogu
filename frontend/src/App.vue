@@ -12,9 +12,6 @@ export default {
     Header
   },
   methods: {
-    toggleAddBook() {
-      this.showAddBook = !this.showAddBook
-    },
     checkCredentials() {
       if (localStorage.getItem('token') === null) {
         this.$router.push('/login')

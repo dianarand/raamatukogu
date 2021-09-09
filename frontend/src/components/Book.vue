@@ -1,5 +1,5 @@
 <template>
-  <li class="list-group-item list-group-item-action d-flex gap-3 py-3">
+  <li @dblclick="toggleExpanded()" class="list-group-item list-group-item-action d-flex gap-3 py-3">
     <div class="d-flex gap-2 w-100 justify-content-between">
       <i class="fas fa-book fa-3x"></i>
       <div>
@@ -13,15 +13,15 @@
           />
         </div>
       </div>
-      <div>
+      <div class="text-nowrap">
         <div role="group">
           <i @click="toggleExpanded()"
              class="fas fa-info-circle"></i>
           <i @click="removeBook(book.id)"
              v-if="ableToRemove"
-              class="fas fa-times"></i>
+             class="fas fa-times"></i>
         </div>
-        <small class="text-nowrap">{{ book.year }}</small>
+        <small>{{ book.year }}</small>
       </div>
     </div>
   </li>
