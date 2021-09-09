@@ -58,7 +58,7 @@ export default {
       this.$emit('setMessage', res)
 
       if (res.status === 201) {
-        this.$emit('addBook', book)
+        this.$emit('addBook', res.data.id)
       }
 
       this.title = ''

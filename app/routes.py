@@ -6,7 +6,7 @@ from app import app
 
 from app.models import Book, User
 from app.search import by_title, by_author, by_year, by_filter
-from app.utils import checkout, reserve, release, get_active_lending, print_books, save_to_db
+from app.utils import checkout, reserve, release, get_active_lending, print_book, print_books, save_to_db
 
 
 @app.route('/books', methods=['GET'])
@@ -51,19 +51,19 @@ def add_book():  # Create a new book
     save_to_db(book)
 
     app.logger.info(f'SUCCESS : Book {book.title} added')
-    return {'message': 'Raamat lisatud edukalt'}, 201
+    return {'message': 'Raamat lisatud edukalt', 'id': book.id}, 201
 
 
-# @app.route('/book/<int:book_id>', methods=['GET'])
-# @jwt_required()
-# def get_book(book_id):  # Get a book
-#     app.logger.info(f'User {current_identity.username} getting book {book_id} information')
-#     book = Book.query.get(book_id)
-#     if not book:
-#         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
-#         return {'message': 'Raamatut ei leitud'}, 404
-#     app.logger.info(f'SUCCESS : Book {book.title} information returned to user {current_identity.username}')
-#     return print_book(book)
+@app.route('/book/<int:book_id>', methods=['GET'])
+@jwt_required()
+def get_book(book_id):  # Get a book
+    app.logger.info(f'User {current_identity.username} getting book {book_id} information')
+    book = Book.query.get(book_id)
+    if not book:
+        app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
+        return {'message': 'Raamatut ei leitud'}, 404
+    app.logger.info(f'SUCCESS : Book {book.title} information returned to user {current_identity.username}')
+    return print_book(book)
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])

@@ -1,6 +1,5 @@
 <template>
-  <div class="p-2 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-2">
+    <div class="p-2 mb-4 container-fluid py-2">
       <h1 class="display-5 fw-bold">
         {{ title }}
         <Button v-show="hasAddBook"
@@ -9,7 +8,7 @@
       </h1>
       <div v-bind:class="alert" role="alert" v-if="msg !== ''">
         {{ msg }}
-        <button type="button" class="btn-close" @click="clearMessage" aria-label="Close"></button>
+        <button type="button" class="btn-close" @click="clearMessage"></button>
       </div>
       <AddBook
         v-show="showAddBook"
@@ -27,7 +26,6 @@
         />
       </ul>
     </div>
-  </div>
 </template>
 
 <script>
@@ -76,8 +74,9 @@ export default {
         // this.$router.push('/login')
       }
     },
-    addBook(book) {
-      this.books = [...this.books, book]
+    async addBook(id) {
+      const res = await axios.get(`book/${id}`)
+      this.books = [...this.books, res.data]
     },
     removeBook(id) {
       this.books = this.books.filter((book) => book.id != id)
