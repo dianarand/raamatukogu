@@ -15,10 +15,12 @@
       <p>Raamat on broneeritud.</p>
       <div v-if="showAdditional">
         <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tühista broneering</a>
-        <br>
         <a href="javascript:void(0)"
          @click="borrowBook(book.id)"
-         v-if="showForBorrower">Laenuta raamat</a><br>
+         v-if="showForBorrower"><br>Laenuta raamat</a>
+        <a href="javascript:void(0)"
+         @click="openLend"
+         v-if="showForLender"><br>Märgi raamat laenutatuks</a>
       </div>
     </div>
     <div v-show="!bookIsOut && !bookIsReserved && !showLend">
@@ -110,6 +112,7 @@ export default {
         this.alert = alertClass(res.status)
         this.msg = res.data.message
         this.showLend = false
+        this.book.reservation = null
       } catch(err) {
         this.alert = alertClass(err.response.status)
         this.msg = err.response.data.message
