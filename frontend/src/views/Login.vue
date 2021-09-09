@@ -47,8 +47,9 @@ export default {
 
       if (res.status === 200) {
         localStorage.setItem('token', res.data.access_token)
-        localStorage.setItem('role', res.data.role)
-        this.$router.push('/')
+        localStorage.setItem('role', res.data.role);
+        axios.defaults.headers.common['Authorization'] = 'JWT ' + res.data.access_token;
+        this.$router.push('/');
       }
 
       this.username = ''

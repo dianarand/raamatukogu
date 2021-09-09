@@ -71,7 +71,7 @@ export default {
         const res = await axios.get(`books?filter=${this.bookFilter}`)
         this.books = res.data.books
       } catch(err) {
-        // this.$router.push('/login')
+        this.$router.push('/login')
       }
     },
     async addBook(id) {

@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Header",
   computed: {
@@ -29,12 +31,10 @@ export default {
   methods: {
     logOut() {
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      axios.defaults.headers.common['Authorization'] = null;
       this.$router.push('/login')
     },
   }
 }
 </script>
-
-<style scoped>
-
-</style>
