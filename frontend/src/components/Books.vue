@@ -17,7 +17,7 @@
         @addBook="addBook"
         @hideAddBook="$emit('toggle-add-book')"
       />
-      <ul class="list-group" :key="book.id" v-for="book in books">
+      <ul class="list-group" :key="book.id" v-for="book in visibleBooks">
         <Book
             :book="book"
             :hasRemoveBook="showForLender"
@@ -26,6 +26,9 @@
             @removeBook="removeBook"
         />
       </ul>
+      <Pagination v-if="this.visibleBooks < this.books"
+                  @previousPage="updatePage(this.currentPage - 1)"
+                  @nextPage="updatePage(this.currentPage + 1)"/>
     </div>
 </template>
 
@@ -33,11 +36,22 @@
 import Button from "./Button";
 import AddBook from "./AddBook";
 import Book from "./Book";
+import Pagination from "./Pagination";
 import {showForLender, showForBorrower, alertClass} from "../utils";
 import axios from "axios";
 
 export default {
   name: 'Header',
+    data() {
+    return {
+      books: [],
+      currentPage: 0,
+      pageSize: 3,
+      visibleBooks: [],
+      msg: '',
+      alert: "alert alert-primary"
+    }
+  },
   props: {
     title: String,
     hasAddBook: Boolean,
@@ -45,6 +59,7 @@ export default {
     bookFilter: String
   },
   components: {
+    Pagination,
     Button,
     AddBook,
     Book
@@ -52,13 +67,6 @@ export default {
   computed: {
     showForLender,
     showForBorrower
-  },
-  data() {
-    return {
-      books: [],
-      msg: '',
-      alert: "alert alert-primary"
-    }
   },
   methods: {
     setMessage(response) {
@@ -75,13 +83,29 @@ export default {
       } catch(err) {
         this.$router.push('/login')
       }
+      this.updateVisibleBooks()
     },
     async addBook(id) {
       const res = await axios.get(`book/${id}`)
       this.books = [...this.books, res.data]
+      this.updateVisibleBooks();
     },
     removeBook(id) {
       this.books = this.books.filter((book) => book.id != id)
+      this.updateVisibleBooks();
+    },
+    updatePage(pageNumber) {
+      this.currentPage = pageNumber;
+      this.updateVisibleBooks();
+    },
+    updateVisibleBooks() {
+      this.visibleBooks = this.books.slice(this.currentPage * this.pageSize,
+          (this.currentPage * this.pageSize) + this.pageSize);
+      if (this.visibleBooks.length === 0 && this.currentPage > 0) {
+        this.updatePage(this.currentPage - 1);
+      } else if (this.visibleBooks.length === 0 && this.currentPage < 0) {
+        this.updatePage(this.currentPage + 1);
+      }
     }
   },
   created() {
