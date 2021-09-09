@@ -7,7 +7,7 @@
     <div v-show="bookIsOut">
       <p>Raamat on välja laenutatud.</p>
       <div v-if="showAdditional">
-        <p :style="{ color: bookColor}">Laenutuse tähtaeg: {{ book.deadline }}</p>
+        <p :style="{ color: bookColor}">Laenutuse tähtaeg: {{ dateFormat(book.deadline) }}</p>
         <a href="javascript:void(0)" @click="returnBook(book.id)">Märgi tagastatuks</a>
       </div>
     </div>
@@ -56,6 +56,7 @@
 <script>
 import axios from "axios";
 import {showForLender, showForBorrower, alertClass} from "../utils";
+import moment from "moment";
 
 export default {
   name: 'ExpandedBook',
@@ -156,6 +157,12 @@ export default {
     },
     cancelLend() {
       this.showLend = false;
+    },
+    dateFormat(date) {
+      if (date != null) {
+        console.log(date);
+        return moment(String(date)).format('DD.MM.YYYY')
+      }
     }
   }
 }
