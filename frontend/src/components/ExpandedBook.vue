@@ -15,6 +15,10 @@
       <p>Raamat on broneeritud.</p>
       <div v-if="showAdditional">
         <a href="javascript:void(0)" @click="cancelReservation(book.id)">Tühista broneering</a>
+        <br>
+        <a href="javascript:void(0)"
+         @click="borrowBook(book.id)"
+         v-if="showForBorrower">Laenuta raamat</a><br>
       </div>
     </div>
     <div v-show="!bookIsOut && !bookIsReserved && !showLend">
@@ -121,6 +125,7 @@ export default {
       }
       this.alert = alertClass(res.status)
       this.msg = res.data.message
+      this.book.reservation = null
     },
     async reserveBook(id) {
       const res = await axios.post(`book/${id}/reserve`)
