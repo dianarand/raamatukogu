@@ -1,12 +1,13 @@
 <template>
-  <div class="container">
-    <div class="header">
-      <h2>Otsingu tulemused</h2>
-    </div>
-    <div :key="book.id" v-for="book in books">
+  <div class="p-2 mb-4 container-fluid py-2">
+    <h2 class="display-8">
+      Otsingu tulemused
+      <button type="button" class="btn-close btn-sm" @click="clearResults"></button>
+    </h2>
+    <ul class="list-group" :key="book.id" v-for="book in books">
       <Book :book="book"
             :showAdditional="false"/>
-    </div>
+    </ul>
   </div>
 </template>
 
@@ -20,6 +21,18 @@ export default {
   },
   components: {
     Book
+  },
+  methods: {
+    clearResults() {
+      this.$emit('clearResults')
+    }
   }
 }
 </script>
+<style scoped>
+.list-group {
+  width: auto;
+  max-width: 460px;
+  margin: auto;
+}
+</style>

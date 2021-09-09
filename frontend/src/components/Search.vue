@@ -1,5 +1,6 @@
 <template>
-  <form @submit.prevent="searchBook()" class="input-group mb-3">
+  <div class="container">
+  <form @submit.prevent="searchBook()">
     <div class="input-group mb-3">
       <select v-model="property" class="input-group-text">
         <option value="title">Pealkiri</option>
@@ -9,26 +10,13 @@
       <input type="search" v-model="search" class="form-control" placeholder="Otsi..." aria-label="Otsi" />
     </div>
   </form>
-  <Results v-if="showResults" :books="result"/>
+  <Results
+      v-if="showResults"
+      :books="result"
+      @clearResults="clearResults"
+  />
+  </div>
 </template>
-
-<!--<template>-->
-<!--  <form @submit.prevent="searchBook()" class="add-form">-->
-<!--    <div class="form-control">-->
-<!--      <input list="properties" v-model="property" name="property" id="property" placeholder="Otsingu parameeter" />-->
-<!--      <datalist id="properties">-->
-<!--        <option value="title">Pealkiri</option>-->
-<!--        <option value="author">Autor</option>-->
-<!--        <option value="year">Ilmumisaasta</option>-->
-<!--      </datalist>-->
-<!--    </div>-->
-<!--    <div class="form-control">-->
-<!--      <input type="text" v-model="search" name="search" placeholder="Otsi raamatut" />-->
-<!--    </div>-->
-<!--    <input type="submit" value="Otsi" class="btn btn-block" />-->
-<!--  </form>-->
-<!--  <Results v-if="showResults" :books="result"/>-->
-<!--</template>-->
 
 <script>
 import axios from "axios";
@@ -39,7 +27,7 @@ export default {
   data() {
     return {
       search: '',
-      property: '',
+      property: 'title',
       result: null
     }
   },
@@ -61,13 +49,15 @@ export default {
       const res = await axios.get(`books?${query}`)
       this.result = res.data.books
     },
+    clearResults() {
+      this.result = null
+    }
   }
 }
 </script>
 <style scoped>
 form {
-  width: 70%;
-  padding: 15px;
+  width: 100%;
   margin: auto;
 }
 </style>
