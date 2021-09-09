@@ -32,18 +32,25 @@ export default {
   },
   methods: {
     async onSubmit() {
-      if(!this.title) {
-        alert('Palun lisa pealkiri')
-        return
+      if (!this.title) {
+        document.getElementById('title').className += " is-invalid"
+      } else {
+        document.getElementById('title').className = "form-control"
       }
 
-      if(!this.author) {
-        alert('Palun lisa autor')
-        return
+      if (!this.author) {
+        document.getElementById('author').className += " is-invalid"
+      } else {
+        document.getElementById('author').className = "form-control"
       }
 
-      if(!this.year) {
-        alert('Palun lisa ilmumisaasta')
+      if (!this.year) {
+        document.getElementById('year').className += " is-invalid"
+      } else {
+        document.getElementById('year').className = "form-control"
+      }
+
+      if (!this.title || !this.author || !this.year) {
         return
       }
 
@@ -53,19 +60,20 @@ export default {
         year: this.year
       }
 
-      const res = await axios.post('books', book)
+      try {
+        const res = await axios.post('books', book)
+        this.$emit('setMessage', res)
+        if (res.status === 201) {
+          this.$emit('addBook', res.data.id)
+          this.title = ''
+          this.author = ''
+          this.year = ''
 
-      this.$emit('setMessage', res)
-
-      if (res.status === 201) {
-        this.$emit('addBook', res.data.id)
+          this.$emit('hideAddBook')
+        }
+      } catch(err) {
+        this.$emit('setMessage', err.response.data.message)
       }
-
-      this.title = ''
-      this.author = ''
-      this.year = ''
-
-      this.$emit('hideAddBook')
     },
   }
 }
