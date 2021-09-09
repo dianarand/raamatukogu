@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from app import app
 from app.db import db
@@ -7,7 +7,7 @@ from app.models import Lending, Reservation
 unavailable_message = {'message': 'Raamat pole saadaval'}
 
 
-def checkout(book, borrower_id):  # check a book out from the library
+def checkout(book, borrower_id, weeks=None):  # check a book out from the library
     if not book.active or get_active_lending(book):
         app.logger.info(f'FAIL : Book {book.title} unavailable')
         return unavailable_message, 400
@@ -24,6 +24,10 @@ def checkout(book, borrower_id):  # check a book out from the library
         book_id=book.id,
         user_id=borrower_id
     )
+
+    if weeks:
+        lending.deadline = date.today()+timedelta(weeks=weeks)
+
     save_to_db(lending)
 
     lending_json = print_usage(lending)

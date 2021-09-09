@@ -34,6 +34,10 @@
           <label for="username">Millisele kasutajale laenutad raamatu?</label>
           <input type="text" v-model="username" class="form-control" id="username" placeholder="Kasutajatunnus">
         </div>
+        <div class="mb-3">
+          <label for="username">Mitmeks nädalaks?</label>
+          <input type="number" min="1" max="52" v-model="weeks" class="form-control" id="weeks" placeholder="Laenutuse kestvus">
+        </div>
         <div class="d-grid gap-2 d-md-block">
           <button class="btn btn-primary float-start" type="submit">Laenuta</button>
           <button class="btn btn-outline-secondary float-end" type="button" @click="cancelLend">Tühista</button>
@@ -55,6 +59,7 @@ export default {
       alert: "alert alert-primary",
       showLend: false,
       username: '',
+      weeks: 4
     }
   },
   props: {
@@ -89,7 +94,10 @@ export default {
     },
     async lendBook(id) {
       try {
-        const res = await axios.post(`book/${id}/lend`, {'borrower': this.username})
+        const res = await axios.post(`book/${id}/lend`, {
+          'borrower': this.username,
+          'weeks': this.weeks
+        })
         if (res.status === 200) {
             this.book.lending = res.data.user
             this.book.deadline = res.data.deadline
@@ -101,6 +109,8 @@ export default {
         this.alert = alertClass(err.response.status)
         this.msg = err.response.data.message
       }
+      this.username = ''
+      this.weeks = 4
     },
     async borrowBook(id) {
       const res = await axios.post(`book/${id}/borrow`)

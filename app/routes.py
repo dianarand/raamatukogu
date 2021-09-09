@@ -131,6 +131,9 @@ def lend_book(book_id):  # Lend a book
         app.logger.info(f'FAIL : User {current_identity.username} queried book {book_id} not found')
         return {'message': 'Raamatut ei leitud'}, 404
 
+    if 'weeks' in data.keys():
+        return checkout(book, user.id, data['weeks'])
+
     return checkout(book, user.id)
 
 
