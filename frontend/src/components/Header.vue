@@ -5,7 +5,7 @@
         <span class="fs-4">Raamatute laenutus</span>
       </router-link>
       <ul class="nav nav-pills">
-        <li v-if="isLoggedIn" class="nav-item">
+        <li v-if="showLogOut" class="nav-item">
           <a href="javascript:void(0)" class="nav-link" @click="logOut">Logi välja</a>
         </li>
       </ul>
@@ -19,13 +19,8 @@ import axios from "axios";
 export default {
   name: "Header",
   computed: {
-    isLoggedIn() {
-      const token = localStorage.getItem('token')
-      if (token !== null && token !== undefined) {
-        return true
-      } else {
-        return false
-      }
+    showLogOut() {
+      return this.$route.path === '/';
     }
   },
   methods: {
