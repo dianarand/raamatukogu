@@ -5,6 +5,7 @@
         <Button v-show="hasAddBook"
           @btn-click="$emit('toggle-add-book')"
           :text="showAddBook ? 'Sulge' : 'Lisa raamat'"/>
+        <i class="fas fa-sync fs-6" @click="fetchBooks" v-if="showForBorrower"></i>
       </h1>
       <div v-bind:class="alert" role="alert" v-if="msg !== ''">
         {{ msg }}
@@ -32,7 +33,7 @@
 import Button from "./Button";
 import AddBook from "./AddBook";
 import Book from "./Book";
-import {showForLender, alertClass} from "../utils";
+import {showForLender, showForBorrower, alertClass} from "../utils";
 import axios from "axios";
 
 export default {
@@ -49,7 +50,8 @@ export default {
     Book
   },
   computed: {
-    showForLender
+    showForLender,
+    showForBorrower
   },
   data() {
     return {
