@@ -24,7 +24,7 @@ class AuthorisationTest(BaseTest):
                        data=json.dumps({'username': 'lender', 'password': 'pass', 'role': 'lender'}),
                        headers={'Content-Type': 'application/json'})
                 response = a.post('/login',
-                                  data=json.dumps({'username': 'lender', 'password':'pass'}),
+                                  data=json.dumps({'username': 'lender', 'password': 'pass'}),
                                   headers={'Content-Type': 'application/json'})
                 self.assertIn('access_token', json.loads(response.data).keys())
 
@@ -83,7 +83,7 @@ class RoutesTest(BaseTest):
                                    headers={'Authorization': auth_header2,
                                             'Content-Type': 'application/json'})
                 self.assertEqual(response2.status_code, 400)
-                self.assertDictEqual(json.loads(response2.data), {'message': 'Puudulikud andmed'})
+                self.assertDictEqual(json.loads(response2.data), {'message': 'Puudulikud või vigased andmed'})
 
                 # Add a book
                 response3 = a.post('/books',

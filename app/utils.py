@@ -70,6 +70,11 @@ def release(book, user_id, usage):  # release a book from a user
             app.logger.info(f'FAIL : Book {book.title} not reserved')
             return {'message': 'Raamat ei ole broneeritud'}, 400
 
+    else:
+        # this should not happen
+        app.logger.error('FAIL : Incorrect usage of function "release" from "utils.py"')
+        return {'message': 'Serveri viga'}, 500
+
     if user_id != book.owner_id and user_id != current_use.user_id:
         app.logger.info(f'FAIL : User {user_id} is unauthorized')
         return {'message': 'Puuduvad õigused'}, 401

@@ -46,7 +46,7 @@ def add_book():  # Create a new book
         )
     except KeyError:
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
-        return {'message': 'Puudulikud andmed'}, 400
+        return {'message': 'Puudulikud või vigased andmed'}, 400
 
     save_to_db(book)
 
@@ -110,7 +110,7 @@ def lend_book(book_id):  # Lend a book
         username = data['borrower']
     except (KeyError, TypeError):
         app.logger.info(f'FAIL : User {current_identity.username} entered invalid data')
-        return {'message': 'invalid data'}, 400
+        return {'message': 'Puudulikud või vigased andmed'}, 400
 
     if not current_identity.lender:
         app.logger.info(f'FAIL : User {current_identity.username} is unauthorized')
@@ -213,6 +213,9 @@ def register_user():  # Create a new user
     elif data['role'] == 'borrower':
         lender = False
         borrower = True
+    else:
+        app.logger.info(f'FAIL : Invalid data entered')
+        return {'message': 'Puudulikud või vigased andmed'}, 400
 
     hashed_password = generate_password_hash(data['password'])
 
