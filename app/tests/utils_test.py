@@ -16,7 +16,7 @@ class UtilitiesTest(BaseTest):
                 'date_begin': date.today(),
                 'date_end': None,
                 'deadline': date.today() + timedelta(weeks=4),
-                'message': 'book successfully checked out'
+                'message': 'Raamat edukalt laenutatud'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book or returned unexpected information')
@@ -39,7 +39,7 @@ class UtilitiesTest(BaseTest):
                 'date_begin': date.today(),
                 'date_end': None,
                 'deadline': date.today() + timedelta(weeks=4),
-                'message': 'book successfully checked out'
+                'message': 'Raamat edukalt laenutatud'
             }
             self.assertDictEqual(ut.checkout(book, 2), expected,
                                  'Unable to check out a book with a reservation')
@@ -76,7 +76,7 @@ class UtilitiesTest(BaseTest):
                 'user': 'Test Borrower',
                 'date_begin': date.today(),
                 'date_end': None,
-                'message': 'book successfully reserved'
+                'message': 'Raamat edukalt broneeritud'
             }
             self.assertDictEqual(ut.reserve(book, 2), expected,
                                  'Unable to reserve a book')
@@ -116,7 +116,7 @@ class UtilitiesTest(BaseTest):
             book = Book.query.first()
 
             # Attempt to return a book that has not been lent
-            expected1 = {'message': 'book is not checked out'}
+            expected1 = {'message': 'Raamat ei ole välja laenatud'}
             response = ut.release(book, 1, 'return')
             self.assertDictEqual(response[0], expected1,
                                  'Did not return correct message when attempted to return an invalid book')
@@ -125,7 +125,7 @@ class UtilitiesTest(BaseTest):
 
             # Mark a book as returned as the book owner
             ut.save_to_db(Lending(book_id=1, user_id=2))
-            expected2 = {'message': 'book is now available'}
+            expected2 = {'message': 'Raamat on nüüd saadaval'}
             self.assertDictEqual(ut.release(book, 1, 'return'), expected2,
                                  'Unable to mark book as returned as a book owner')
 
@@ -143,7 +143,7 @@ class UtilitiesTest(BaseTest):
             )
             ut.save_to_db(malicious_user)
             ut.save_to_db(Lending(book_id=1, user_id=2))
-            expected3 = {'message': 'unauthorized'}
+            expected3 = {'message': 'Puuduvad õigused'}
             response = ut.release(book, 3, 'return')
             self.assertDictEqual(response[0], expected3,
                                  'Did not return error when attempting to return a book unauthorized')
@@ -155,13 +155,13 @@ class UtilitiesTest(BaseTest):
             book = Book.query.first()
 
             # Attempt to cancel the reservation on a book that has not been reserved
-            expected1 = ({'message': 'book has not been reserved'}, 400)
+            expected1 = ({'message': 'Raamat ei ole broneeritud'}, 400)
             self.assertTupleEqual(ut.release(book, 1, 'cancel'), expected1,
                                   'Did not return error when attempting to cancel a reservation for a unreserved book')
 
             # Cancel a reservation as a book owner
             ut.save_to_db(Reservation(book_id=1, user_id=2))
-            expected2 = {'message': 'book is now available'}
+            expected2 = {'message': 'Raamat on nüüd saadaval'}
             self.assertDictEqual(ut.release(book, 1, 'cancel'), expected2,
                                  'Unable to cancel reservation as a book owner')
 
@@ -179,7 +179,7 @@ class UtilitiesTest(BaseTest):
             )
             ut.save_to_db(malicious_user)
             ut.save_to_db(Reservation(book_id=1, user_id=2))
-            expected3 = {'message': 'unauthorized'}
+            expected3 = {'message': 'Puuduvad õigused'}
             response = ut.release(book, 3, 'cancel')
             self.assertDictEqual(response[0], expected3,
                                  'Did not return error when attempting to cancel a reservation unauthorized')

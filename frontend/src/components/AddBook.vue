@@ -1,23 +1,25 @@
 <template>
-  <form @submit.prevent="onSubmit" class="add-form">
-    <div class="form-control">
-      <label>Pealkiri</label>
-      <input type="text" v-model="title" name="title" placeholder="Lisa raamat" />
-    </div>
-    <div class="form-control">
-      <label>Autor</label>
-      <input type="text" v-model="author" name="autor" placeholder="Lisa autor" />
-    </div>
-    <div class="form-control">
-      <label>Ilmumisaasta</label>
-      <input type="text" v-model="year" name="year" placeholder="Lisa ilmumisaasta" />
-    </div>
-    <input type="submit" value="Salvesta raamat" class="btn btn-block" />
-  </form>
+  <main class="form">
+    <form @submit.prevent="onSubmit">
+      <h1 class="h3 mb-3 fw-normal">Lisa uus raamat</h1>
+      <div class="form-floating">
+        <input type="text" v-model="title" class="form-control" id="title" placeholder="Pealkiri">
+        <label for="title">Pealkiri</label>
+      </div>
+      <div class="form-floating">
+        <input type="text" v-model="author" class="form-control" id="author" placeholder="Autor">
+        <label for="author">Autor</label>
+      </div>
+      <div class="form-floating">
+        <input type="number" min="1700" max="2050" v-model="year" class="form-control" id="year" placeholder="Ilmumisaasta">
+        <label for="author">Ilmumisaasta</label>
+      </div>
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Salvesta raamat</button>
+    </form>
+  </main>
 </template>
-
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   name: 'AddBook',
@@ -30,19 +32,26 @@ export default {
   },
   methods: {
     async onSubmit() {
-      if(!this.title) {
-        alert('Palun lisa pealkiri')
-        return
+      if (!this.title) {
+        document.getElementById('title').className += ' is-invalid';
+      } else {
+        document.getElementById('title').className = 'form-control';
       }
 
-      if(!this.author) {
-        alert('Palun lisa autor')
-        return
+      if (!this.author) {
+        document.getElementById('author').className += ' is-invalid';
+      } else {
+        document.getElementById('author').className = 'form-control';
       }
 
-      if(!this.year) {
-        alert('Palun lisa ilmumisaasta')
-        return
+      if (!this.year) {
+        document.getElementById('year').className += ' is-invalid';
+      } else {
+        document.getElementById('year').className = 'form-control';
+      }
+
+      if (!this.title || !this.author || !this.year) {
+        return;
       }
 
       const book = {
@@ -51,20 +60,27 @@ export default {
         year: this.year
       }
 
-      const res = await axios.post('books', book)
-
-      this.$emit('setMessage', res.data.message)
-
-      if (res.status === 201) {
-        this.$emit('addBook', book)
+      try {
+        const res = await axios.post('books', book);
+        this.$emit('setMessage', res);
+        if (res.status === 201) {
+          this.$emit('addBook', res.data.id)
+          this.title = ''
+          this.author = ''
+          this.year = ''
+          this.$emit('hideAddBook')
+        }
+      } catch(err) {
+        this.$emit('setMessage', err.response);
       }
-
-      this.title = ''
-      this.author = ''
-      this.year = ''
-
-      this.$emit('hideAddBook')
     },
   }
 }
 </script>
+<style scoped>
+.form input[type="number"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+</style>
