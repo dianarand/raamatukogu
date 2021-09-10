@@ -55,23 +55,23 @@ Allpool on välja toodud kõik võimalikud päringud, mida Flask REST API võima
 
 Iga päring, v.a. sisselogimine ja registreerimine, nõuab autoriseerimist.
 
-Juhul kui päring vajab datat, siis siin on kirjeldatud selle formaat.
+Juhul kui päring vajab datat, siis siin on kirjeldatud selle formaat näidisena.
 
 **Sisselogimine** 
 `POST /login/`
 ```json
 {
-  "username": [string], 
-  "password": [string]
+  "username": "kasutajatunnus", 
+  "password": "parool"
 }
 ```
 **Registreerimine** 
 `POST /register`
 ```json
 {
-  "username": [string], 
-  "password": [string],
-  "role": [string]
+  "username": "kasutajatunnus", 
+  "password": "parool",
+  "role": "lender"
 }
 ```
 Parameetri "role" väärtus saab olla "lender" (laenaja) või "borrower" (laenutaja)
@@ -89,9 +89,9 @@ GET /books?title=pealkiri või GET /books?filter=reserved_by_me
 `POST /books`
 ```json
 {
-  "title": [string],
-  "author": [string], 
-  "year": [int]
+  "title": "Harry Potter and Philosopher's Stone",
+  "author": "J. K. Rowling", 
+  "year": 1997
 }
 ```
 
@@ -107,12 +107,13 @@ Järgnevatel päringutel URLi parameeter `id=[int]` sisaldab selle raamatu ID, m
 `POST /book/:id/lend`
 ```json
 {
-    "borrower": [string],
-    "weeks": [int]
+    "borrower": "kasutajanimi",
+    "weeks": 4
 }
 ```
 Parameeter "borrower" peab sisaldama laenutaja kasutajanime. 
 Parameeter "weeks" on valikuline ja määrab laenutuse kestuse nädalates.
+Kui parameetrit ei määrata, siis kasutatakse vaikimisi laenutuse kestvust (neli nädalat).
 
 **Raamatu laenutamine** 
 `POST /book/:id/borrow`
