@@ -111,12 +111,17 @@ Järgnevatel päringutel URLi parameeter `id=[int]` sisaldab selle raamatu ID, m
     "weeks": 4
 }
 ```
+Selle päringuga saab laenaja rollis kasutaja välja laenutada oma raamatu valitud laenutajale.
+
 Parameeter "borrower" peab sisaldama laenutaja kasutajanime. 
+
 Parameeter "weeks" on valikuline ja määrab laenutuse kestuse nädalates.
 Kui parameetrit ei määrata, siis kasutatakse vaikimisi laenutuse kestvust (neli nädalat).
 
 **Raamatu laenutamine** 
 `POST /book/:id/borrow`
+
+Selle päringuga saab laenutaja rollis kasutaja endale laenata raamatu.
 
 **Raamatu tagastamine** 
 `POST /book/:id/return`
