@@ -45,6 +45,7 @@ export default {
   },
   methods: {
     async searchBook() {
+      this.clearResults()
       const query = `${this.property}=${this.search}`
       const res = await axios.get(`books?${query}`)
       this.result = res.data.books

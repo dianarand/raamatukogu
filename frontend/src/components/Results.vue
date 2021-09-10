@@ -4,6 +4,7 @@
       Otsingu tulemused
       <button type="button" class="btn-close btn-sm" @click="clearResults"></button>
     </h2>
+    <p v-if="books.length === 0">Otsinguparameetritele vastavaid raamatuid ei leitud</p>
     <ul class="list-group" :key="book.id" v-for="book in visibleBooks">
       <Book :book="book"
             :showAdditional="false"/>
