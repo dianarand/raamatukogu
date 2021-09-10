@@ -17,6 +17,7 @@
         @addBook="addBook"
         @hideAddBook="$emit('toggle-add-book')"
       />
+      <p v-if="books.length === 0">Pole raamatuid, mida kuvada</p>
       <ul class="list-group" :key="book.id" v-for="book in visibleBooks">
         <Book
             :book="book"
@@ -26,7 +27,7 @@
             @removeBook="removeBook"
         />
       </ul>
-      <Pagination v-if="this.visibleBooks < this.books"
+      <Pagination v-if="this.visibleBooks.length < this.books.length"
                   @previousPage="updatePage(this.currentPage - 1)"
                   @nextPage="updatePage(this.currentPage + 1)"/>
     </div>
