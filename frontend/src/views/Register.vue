@@ -36,10 +36,10 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
-  name: 'LogIn',
+  name: 'Register',
   data() {
     return {
       username: '',
@@ -51,22 +51,22 @@ export default {
   methods: {
     async onSubmit() {
       if (!this.username) {
-        document.getElementById('username').className += " is-invalid"
-        document.getElementById('password').className += " is-invalid"
+        document.getElementById('username').className += ' is-invalid';
+        document.getElementById('password').className += ' is-invalid';
         return
       } else {
-        document.getElementById('username').className = "form-control"
+        document.getElementById('username').className = 'form-control';
       }
 
       if (!this.password) {
-        document.getElementById('password').className += " is-invalid"
+        document.getElementById('password').className += ' is-invalid';
         return
       } else {
-        document.getElementById('password').className = "form-control"
+        document.getElementById('password').className = 'form-control';
       }
 
       if (!this.role) {
-        this.setMessage("Rolli valik on kohustuslik")
+        this.setMessage("Rolli valik on kohustuslik");
         return
       }
 
@@ -75,22 +75,22 @@ export default {
           username: this.username,
           password: this.password,
           role: this.role
-        })
+        });
         if (res.status === 201) {
           this.$router.push('/login');
         }
       } catch(err) {
-        this.setMessage(err.response.data.message)
+        this.setMessage(err.response.data.message);
       }
 
-      this.username = ''
-      this.password = ''
+      this.username = '';
+      this.password = '';
     },
     setMessage(message) {
-      this.msg = message
+      this.msg = message;
     },
     clearMessage() {
-      this.msg = ''
+      this.msg = '';
     }
   }
 }

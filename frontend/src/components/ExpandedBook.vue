@@ -54,12 +54,17 @@
 </template>
 
 <script>
-import axios from "axios";
-import {showForLender, showForBorrower, alertClass} from "../utils";
-import moment from "moment";
+import {showForLender, showForBorrower, alertClass} from '../utils';
+import axios from 'axios';
+import moment from 'moment';
 
 export default {
   name: 'ExpandedBook',
+  props: {
+    book: Object,
+    bookColor: String,
+    showAdditional: Boolean
+  },
   data() {
     return {
       msg: '',
@@ -69,29 +74,16 @@ export default {
       weeks: 4
     }
   },
-  props: {
-    book: Object,
-    bookColor: String,
-    showAdditional: Boolean
-  },
   computed: {
     bookIsOut() {
       if (this.book.lending === undefined) {
-        return false
-      } else if (this.book.lending !== null) {
-        return true
-      } else {
-        return false
-      }
+        return false;
+      } else return this.book.lending !== null;
     },
     bookIsReserved() {
       if (this.book.reservation === undefined) {
-        return false
-      } else if (this.book.reservation !== null) {
-        return true
-      } else {
-        return false
-      }
+        return false;
+      } else return this.book.reservation !== null;
     },
     showForLender,
     showForBorrower
@@ -107,61 +99,60 @@ export default {
           'weeks': this.weeks
         })
         if (res.status === 200) {
-            this.book.lending = res.data.user
-            this.book.deadline = res.data.deadline
+            this.book.lending = res.data.user;
+            this.book.deadline = res.data.deadline;
           }
-        this.alert = alertClass(res.status)
-        this.msg = res.data.message
-        this.showLend = false
-        this.book.reservation = null
+        this.alert = alertClass(res.status);
+        this.msg = res.data.message;
+        this.showLend = false;
+        this.book.reservation = null;
       } catch(err) {
-        this.alert = alertClass(err.response.status)
-        this.msg = err.response.data.message
+        this.alert = alertClass(err.response.status);
+        this.msg = err.response.data.message;
       }
-      this.username = ''
-      this.weeks = 4
+      this.username = '';
+      this.weeks = 4;
     },
     async borrowBook(id) {
-      const res = await axios.post(`book/${id}/borrow`)
+      const res = await axios.post(`book/${id}/borrow`);
       if (res.status === 200) {
-        this.book.lending = res.data.user
-        this.book.deadline = res.data.deadline
+        this.book.lending = res.data.user;
+        this.book.deadline = res.data.deadline;
       }
       this.alert = alertClass(res.status)
-      this.msg = res.data.message
-      this.book.reservation = null
+      this.msg = res.data.message;
+      this.book.reservation = null;
     },
     async reserveBook(id) {
-      const res = await axios.post(`book/${id}/reserve`)
+      const res = await axios.post(`book/${id}/reserve`);
       if (res.status === 200) {
-        this.book.reservation = res.data.user
+        this.book.reservation = res.data.user;
       }
-      this.alert = alertClass(res.status)
-      this.msg = res.data.message
+      this.alert = alertClass(res.status);
+      this.msg = res.data.message;
     },
     async returnBook(id) {
-      const res = await axios.post(`book/${id}/return`)
+      const res = await axios.post(`book/${id}/return`);
       if (res.status === 200) {
-          this.book.lending = null
+          this.book.lending = null;
         }
-      this.alert = alertClass(res.status)
-      this.msg = res.data.message
+      this.alert = alertClass(res.status);
+      this.msg = res.data.message;
     },
     async cancelReservation(id) {
-      const res = await axios.post(`book/${id}/cancel`)
+      const res = await axios.post(`book/${id}/cancel`);
       if (res.status === 200) {
-          this.book.reservation = null
+          this.book.reservation = null;
         }
-      this.alert = alertClass(res.status)
-      this.msg = res.data.message
+      this.alert = alertClass(res.status);
+      this.msg = res.data.message;
     },
     cancelLend() {
       this.showLend = false;
     },
     dateFormat(date) {
       if (date != null) {
-        console.log(date);
-        return moment(String(date)).format('DD.MM.YYYY')
+        return moment(String(date)).format('DD.MM.YYYY');
       }
     }
   }
@@ -170,6 +161,6 @@ export default {
 <style scoped>
 .alert {
   width: 100%;
-  margin: 15px 0px;
+  margin: 15px 0;
 }
 </style>

@@ -7,7 +7,7 @@
         <option value="author">Autor</option>
         <option value="year">Ilmumisaasta</option>
       </select>
-      <input type="search" v-model="search" class="form-control" placeholder="Otsi..." aria-label="Otsi" />
+      <input type="search" v-model="search" class="form-control" placeholder="Otsi..." />
     </div>
   </form>
   <Results
@@ -19,11 +19,14 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 import Results from './Results'
 
 export default {
   name: 'Search',
+  components: {
+    Results
+  },
   data() {
     return {
       search: '',
@@ -31,31 +34,25 @@ export default {
       result: null
     }
   },
-  components: {
-    Results
-  },
   computed: {
     showResults() {
-      if (this.result !== null) {
-        return true
-      } else {
-        return false
-      }
+      return this.result !== null;
     }
   },
   methods: {
     async searchBook() {
-      this.clearResults()
-      const query = `${this.property}=${this.search}`
-      const res = await axios.get(`books?${query}`)
-      this.result = res.data.books
+      this.clearResults();
+      const query = `${this.property}=${this.search}`;
+      const res = await axios.get(`books?${query}`);
+      this.result = res.data.books;
     },
     clearResults() {
-      this.result = null
+      this.result = null;
     }
   }
 }
 </script>
+
 <style scoped>
 form {
   width: 100%;

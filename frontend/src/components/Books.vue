@@ -34,24 +34,20 @@
 </template>
 
 <script>
-import Button from "./Button";
-import AddBook from "./AddBook";
-import Book from "./Book";
-import Pagination from "./Pagination";
-import {showForLender, showForBorrower, alertClass} from "../utils";
-import axios from "axios";
+import Book from './Book';
+import Button from './Button';
+import AddBook from './AddBook';
+import Pagination from './Pagination';
+import {showForLender, showForBorrower, alertClass} from '../utils';
+import axios from 'axios';
 
 export default {
-  name: 'Header',
-    data() {
-    return {
-      books: [],
-      currentPage: 0,
-      pageSize: 3,
-      visibleBooks: [],
-      msg: '',
-      alert: "alert alert-primary"
-    }
+  name: 'Books',
+  components: {
+    Pagination,
+    Button,
+    AddBook,
+    Book
   },
   props: {
     title: String,
@@ -59,11 +55,15 @@ export default {
     showAddBook: Boolean,
     bookFilter: String
   },
-  components: {
-    Pagination,
-    Button,
-    AddBook,
-    Book
+  data() {
+    return {
+      books: [],
+      currentPage: 0,
+      pageSize: 3,
+      visibleBooks: [],
+      msg: '',
+      alert: 'alert alert-primary'
+    }
   },
   computed: {
     showForLender,
@@ -71,28 +71,28 @@ export default {
   },
   methods: {
     setMessage(response) {
-      this.alert = alertClass(response.status) + ' alert-dismissible fade show'
-      this.msg = response.data.message
+      this.alert = alertClass(response.status) + ' alert-dismissible fade show';
+      this.msg = response.data.message;
     },
     clearMessage() {
-      this.msg = ''
+      this.msg = '';
     },
     async fetchBooks() {
       try {
-        const res = await axios.get(`books?filter=${this.bookFilter}`)
-        this.books = res.data.books
+        const res = await axios.get(`books?filter=${this.bookFilter}`);
+        this.books = res.data.books;
       } catch(err) {
-        this.$router.push('/login')
+        this.$router.push('/login');
       }
-      this.updateVisibleBooks()
+      this.updateVisibleBooks();
     },
     async addBook(id) {
-      const res = await axios.get(`book/${id}`)
-      this.books = [...this.books, res.data]
+      const res = await axios.get(`book/${id}`);
+      this.books = [...this.books, res.data];
       this.updateVisibleBooks();
     },
     removeBook(id) {
-      this.books = this.books.filter((book) => book.id != id)
+      this.books = this.books.filter((book) => book.id !== id);
       this.updateVisibleBooks();
     },
     updatePage(pageNumber) {
@@ -110,20 +110,15 @@ export default {
     }
   },
   created() {
-    this.fetchBooks()
+    this.fetchBooks();
     if (this.showForLender === true) {
       this.pageSize = 8;
     }
   },
-  emits: ['toggle-add-book'],
+  emits: ['toggle-add-book']
 }
 </script>
 <style scoped>
-.list-group {
-  width: auto;
-  max-width: 460px;
-  margin: auto;
-}
 .alert {
   width: 100%;
   max-width: 450px;

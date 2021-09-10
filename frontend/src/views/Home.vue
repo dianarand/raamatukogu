@@ -27,20 +27,20 @@
 </template>
 
 <script>
-import Search from '../components/Search'
-import Books from '../components/Books'
-import {showForBorrower, showForLender} from "../utils";
+import Books from '../components/Books';
+import Search from '../components/Search';
+import {showForBorrower, showForLender} from '../utils';
 
 export default {
   name: 'Home',
+  components: {
+    Search,
+    Books
+  },
   data() {
     return {
       showAddBook: false
     }
-  },
-  components: {
-    Search,
-    Books
   },
   computed: {
     showForBorrower,
@@ -48,8 +48,15 @@ export default {
   },
   methods: {
     toggleAddBook() {
-      this.showAddBook = !this.showAddBook
+      this.showAddBook = !this.showAddBook;
     }
   }
 }
 </script>
+<style>
+.list-group {
+  width: auto;
+  max-width: 460px;
+  margin: auto;
+}
+</style>

@@ -19,7 +19,7 @@
   </main>
 </template>
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   name: 'AddBook',
@@ -33,25 +33,25 @@ export default {
   methods: {
     async onSubmit() {
       if (!this.title) {
-        document.getElementById('title').className += " is-invalid"
+        document.getElementById('title').className += ' is-invalid';
       } else {
-        document.getElementById('title').className = "form-control"
+        document.getElementById('title').className = 'form-control';
       }
 
       if (!this.author) {
-        document.getElementById('author').className += " is-invalid"
+        document.getElementById('author').className += ' is-invalid';
       } else {
-        document.getElementById('author').className = "form-control"
+        document.getElementById('author').className = 'form-control';
       }
 
       if (!this.year) {
-        document.getElementById('year').className += " is-invalid"
+        document.getElementById('year').className += ' is-invalid';
       } else {
-        document.getElementById('year').className = "form-control"
+        document.getElementById('year').className = 'form-control';
       }
 
       if (!this.title || !this.author || !this.year) {
-        return
+        return;
       }
 
       const book = {
@@ -61,37 +61,23 @@ export default {
       }
 
       try {
-        const res = await axios.post('books', book)
-        this.$emit('setMessage', res)
+        const res = await axios.post('books', book);
+        this.$emit('setMessage', res);
         if (res.status === 201) {
           this.$emit('addBook', res.data.id)
           this.title = ''
           this.author = ''
           this.year = ''
-
           this.$emit('hideAddBook')
         }
       } catch(err) {
-        this.$emit('setMessage', err.response.data.message)
+        this.$emit('setMessage', err.response);
       }
     },
   }
 }
 </script>
 <style scoped>
-html,
-body {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
-}
-
 .form input[type="number"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;

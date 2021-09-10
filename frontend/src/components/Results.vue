@@ -7,6 +7,7 @@
     <p v-if="books.length === 0">Otsinguparameetritele vastavaid raamatuid ei leitud</p>
     <ul class="list-group" :key="book.id" v-for="book in visibleBooks">
       <Book :book="book"
+            :hasRemoveBook="false"
             :showAdditional="false"/>
     </ul>
     <Pagination v-if="this.visibleBooks < this.books"
@@ -21,6 +22,13 @@ import Pagination from "./Pagination";
 
 export default {
   name: 'Results',
+  components: {
+    Book,
+    Pagination
+  },
+  props: {
+    books: Array
+  },
   data() {
     return {
       currentPage: 0,
@@ -28,16 +36,9 @@ export default {
       visibleBooks: [],
     }
   },
-  props: {
-    books: Array
-  },
-  components: {
-    Book,
-    Pagination
-  },
   methods: {
     clearResults() {
-      this.$emit('clearResults')
+      this.$emit('clearResults');
     },
     updatePage(pageNumber) {
       this.currentPage = pageNumber;
@@ -54,14 +55,7 @@ export default {
     }
   },
   created() {
-    this.updateVisibleBooks()
+    this.updateVisibleBooks();
   }
 }
 </script>
-<style scoped>
-.list-group {
-  width: auto;
-  max-width: 460px;
-  margin: auto;
-}
-</style>

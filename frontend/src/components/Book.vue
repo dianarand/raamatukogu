@@ -7,10 +7,10 @@
         <p class="mb-1">{{ book.author }}</p>
         <div>
           <ExpandedBook
-          v-show="showExpanded"
-          :book="book"
-          :showAdditional="showAdditional"
-          :bookColor="bookColor"
+            v-show="showExpanded"
+            :book="book"
+            :bookColor="bookColor"
+            :showAdditional="showAdditional"
           />
           <div v-show="showRemove">
             <hr>
@@ -41,13 +41,18 @@
 </template>
 
 <script>
-import ExpandedBook from './ExpandedBook'
-import axios from "axios";
+import ExpandedBook from './ExpandedBook';
+import axios from 'axios';
 
 export default {
   name: 'Book',
   components: {
     ExpandedBook
+  },
+  props: {
+    book: Object,
+    hasRemoveBook: Boolean,
+    showAdditional: Boolean
   },
   data() {
     return {
@@ -55,18 +60,9 @@ export default {
       showRemove: false
     }
   },
-  props: {
-    book: Object,
-    hasRemoveBook: Boolean,
-    showAdditional: Boolean
-  },
   computed: {
     ableToRemove() {
-      if (this.hasRemoveBook && this.book.lending == null){
-        return true
-      } else {
-        return false
-      }
+      return this.hasRemoveBook && this.book.lending == null;
     },
     bookColor() {
       if (this.book.overtime === true && this.showAdditional === true) {
@@ -79,23 +75,23 @@ export default {
   methods: {
     async removeBook(id) {
       try {
-        const res = await axios.delete(`http://localhost:5000/book/${id}`)
+        const res = await axios.delete(`book/${id}`);
         if (res.status === 200) {
-          this.$emit('removeBook', id)
+          this.$emit('removeBook', id);
         }
-        this.$emit('setMessage', res)
+        this.$emit('setMessage', res);
       } catch(err) {
-        this.$emit('setMessage', err.response)
+        this.$emit('setMessage', err.response);
       }
     },
     toggleExpanded() {
-      this.showExpanded = !this.showExpanded
+      this.showExpanded = !this.showExpanded;
     },
     openRemove() {
-      this.showRemove = true
+      this.showRemove = true;
     },
     cancelRemove() {
-      this.showRemove = false
+      this.showRemove = false;
     }
   },
   emits: ['removeBook', 'setMessage']
@@ -103,9 +99,7 @@ export default {
 </script>
 
 <style scoped>
-
 i {
   margin: 5px;
 }
-
 </style>

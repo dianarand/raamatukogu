@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   name: 'Login',
@@ -31,18 +31,18 @@ export default {
     async onSubmit() {
 
       if (!this.username) {
-        document.getElementById('username').className += " is-invalid"
-        document.getElementById('password').className += " is-invalid"
+        document.getElementById('username').className += ' is-invalid';
+        document.getElementById('password').className += ' is-invalid';
         return
       } else {
-        document.getElementById('username').className = "form-control"
+        document.getElementById('username').className = 'form-control';
       }
 
       if (!this.password) {
-        document.getElementById('password').className += " is-invalid"
+        document.getElementById('password').className += ' is-invalid';
         return
       } else {
-        document.getElementById('password').className = "form-control"
+        document.getElementById('password').className = 'form-control';
       }
 
       try {
@@ -51,18 +51,18 @@ export default {
           password: this.password
         })
         if (res.status === 200) {
-          localStorage.setItem('token', res.data.access_token)
+          localStorage.setItem('token', res.data.access_token);
           localStorage.setItem('role', res.data.role);
           axios.defaults.headers.common['Authorization'] = 'JWT ' + res.data.access_token;
           this.$router.push('/');
         }
       } catch {
-        document.getElementById('username').className += " is-invalid"
-        document.getElementById('password').className += " is-invalid"
+        document.getElementById('username').className += ' is-invalid';
+        document.getElementById('password').className += ' is-invalid';
       }
 
-      this.username = ''
-      this.password = ''
+      this.username = '';
+      this.password = '';
     }
   }
 }

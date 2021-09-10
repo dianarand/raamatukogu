@@ -6,12 +6,11 @@
 export default {
   name: 'Button',
   props: {
-    text: String,
-    color: String
+    text: String
   },
   methods: {
      onClick () {
-       this.$emit('btn-click')
+       this.$emit('btn-click');
      }
   }
 }
