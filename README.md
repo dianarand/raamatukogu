@@ -1,6 +1,8 @@
 # Raamatukogu
 Raamatute laenutamise teemaline prooviülesanne. 
-Ülesanne on teostatud kasutades Python 3.9 ja Vue.js 3.0.
+
+Ülesanne on teostatud kasutades Python 3.9 ja Vue.js 3.0. 
+Kasutatud on SQLite andmebaasi.
 
 ## Tutvustus
 Rakendus võimaldab kasutajatel laenata üksteisele raamatuid.
